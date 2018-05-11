@@ -1,7 +1,185 @@
+# Oasis Deployment Scripts
+
+## 1. The Oasis modeling enviroment
+
+![alt text](https://github.com/OasisLMF/deployment/raw/assets/fig_oasis_environment.png )
+
+
+
+### 1.1 Components
+The Oasis platform is modularized using docker containers. The use of docker containers provides a mechanism for deploying a library of risk models and options for scaling out the platform, as well as portability between Linux distributions on the host servers. This guide will focus in on a *base case* deployment, which is the minimal set of docker containers required to run the Oasis example catastrophe loss model PiWind.
+
+#### Linux Server
+A host (or hosts) which meets the system requirements for running docker, for example it must be running Version 3.10 or higher of the Linux kernel.
+
+
+#### Windows Server
+The flamingo_server docker image requires Microsoft SQL server 2016 for data storage and transformation.
+
+#### Docker Images
+All of the core components required for an example deployment are publicly available on Docker Hub.
+
+
+>  [coreoasis/shiny_proxy](https://hub.docker.com/r/coreoasis/shiny_proxy)
+
+
+>  [coreoasis/flamingo_server](https://hub.docker.com/r/coreoasis/flamingo_server)
+
+
+>  [coreoasis/oasis_api_server](https://hub.docker.com/r/coreoasis/oasis_api_server)
+
+>  [coreoasis/model_execution_worker](https://hub.docker.com/r/coreoasis/model_execution_worker)
+
+>  [coreoasis/piwind_keys_server](https://hub.docker.com/r/coreoasis/piwind_keys_server)
+
+
+<!--- ### 1.2 Optional Components -->
+
+## 2. Script Usage
+There are cloud deployment scripts which semi-automates these sections to create Oasis base environments. Which can then be configured to run more sophisticated Insurance loss models.
+
+Deployment is split into two scripts, one per AWS instance type, see fig 1.
+* SQLPublic.py for the windows SQL server
+* Flamingo_Midtier_CalcBE.py Creates the linux instance
+
+### 2.1 Prerequisites
+* The scripts are being run from a linux machine. While it might be possible to run from windows that scenario is not covered by this document.
+
+* The target AWS account has the desired VPC, subnet, Gateway, Security Group and KeyPair setup. If not, then see the `Network infrastructure` section of AWS deployment scripts readme.
+
+* The AWS account has an AMI for the Windows SQL server, as outlined in section 2.1
+
+### 2.2 Examples
+
+#### Creating a Windows AWS Instance
+```
+# Clone script repository
+git clone https://github.com/OasisLMF/AWS.git
+
+# Install script dependencies  
+pip install -r requirements.txt
+
+# Example AWS Values  
+AWS_PROFILE=<YOUR_AWS_ACCOUNT>
+IP_ADDRESS='10.10.0.xxx'
+INSTANCE_NAME='MS_SQL_SERVER_2014'
+VOLUME_SIZE='50'
+INSTANCE_TYPE='t2.medium'
+KEY_NAME='PrivateKeyName'
+REGION='eu-west-1'
+SECURITY_GROUP='sg-xxxxxxxx'
+SUBNET='subnet-xxxxxxxx'
+
+# Run the script
+./deploy_SQL.py --session       $AWS_PROFILE\
+                --region        $REGION\
+                --key           $KEY_NAME \
+                --securitygroup $SECURITY_GROUP \
+                --type          $INSTANCE_TYPE \
+                --size          $VOLUME_SIZE \
+                --subnet        $SUBNET \
+                --ip            $IP_ADDRESS \
+                --name          $INSTANCE_NAME
+```
+
+#### Creating an Ubuntu 16.04 AWS Instance
+```
+# Clone script repository
+git clone https://github.com/OasisLMF/AWS.git
+
+# Install script dependencies  
+pip install -r requirements.txt
+
+# Example Values  
+    AWS_PROFILE=<YOUR_SESSION>
+    IP_ADDRESS='10.10.0.222'
+    INSTANCE_NAME='LINUX_OASIS_INSTALLED’
+    VOLUME_SIZE='50'
+    INSTANCE_TYPE='t2.medium'
+    KEY_NAME='MyPrivateKeyName'
+    REGION='eu-west-1'
+    SECURITY_GROUP='sg-1d8c277b'
+    SUBNET='subnet-b4eaa8c2'
+
+    # SQL server connection Values
+    SQL_IP='10.10.0.111'
+    SQL_SA_PASSWORD='Test1234'
+    SQL_ENV_NAME='piwind'
+    SQL_ENV_PASS='piwind'
+    SQL_ENV_FILES_LOC='C:/flamingo_share/Files'
+
+    # Oasis Core & UI
+    OASIS_VERSION=0.391.2
+    FLAMINGO_RELEASE_TAG=$OASIS_VERSION
+    SHINY_ENV_FILES_LOC='/var/www/oasis/Files'  
+    ENV_VERSION=$OASIS_VERSION
+    OASIS_RELEASE_TAG=$OASIS_VERSION
+    OASIS_API_IP=$IP_ADDRESS
+    OASIS_API_PORT='8001'
+
+    # Model Deployment
+    MODEL_VERSION='PiWind'
+    MODEL_SUPPLIER='OasisLMF'
+    KEYS_SERVICE_IP=$IP_ADDRESS
+    KEYS_SERVICE_PORT='9001'
+
+    # Account Credentials
+    GIT_USER=some_git_user
+    GIT_PASSWORD=pass
+    DOCKER_USER=some_docker_user
+    DOCKER_PASSWORD=pass
+
+# Run the script
+./deploy_OASIS.py --session $AWS_PROFILE \
+                  --region $REGION\
+                  --size $VOLUME_SIZE\
+                  --key $KEY_NAME\
+                  --securitygroup $SECURITY_GROUP \
+                  --type $INSTANCE_TYPE \
+                  --subnet $SUBNET \
+                  --ip $IP_ADDRESS \
+                  --name $INSTANCE_NAME\
+                  --sqlip $SQL_IP \
+                  --sqlsapass $SQL_SA_PASSWORD \
+                  --sqlenvname $SQL_ENV_NAME \
+                  --sqlenvpass $SQL_ENV_PASS\
+                  --sqlenvfilesloc $SQL_ENV_FILES_LOC\
+                  --shinyenvfilesloc $SHINY_ENV_FILES_LOC\
+                  --envversion $ENV_VERSION \
+                  --keysip $KEYS_SERVICE_IP \
+                  --keysport $KEYS_SERVICE_PORT\
+                  --gituser $GIT_USER\
+                  --gitpassword $GIT_PASSWORD\
+                  --dockeruser $DOCKER_USER\
+                  --dockerpassword $DOCKER_PASSWORD
+```
+
+# Local Deployment Guide
+
+
+## 3. Windows SQL Server Installation
+
+### 3.1 Creating an AMI
+### 3.2 Installing Fileshare Drivers
+### 3.3 SQL Server setup
+
+## 4. Linux Environment Setup
+
+### 4.1 Install requirments
+### 4.2 Configure the docker daemon
+### 4.3 Setup of File Shares
+### 4.4 Installing Flamingo
+### 4.5 Installing a model
+
+## License
+The code in this project is licensed under BSD 3-clause license.
+
+<!---
+
 # AWS
 Provides a fully automated build of the Oasis platform on AWS. Alternatively, the scripts can be used to deploy a standalone system via a more manual process.
 
-<!-- TOC depthFrom:2 -->
+
 
 - [Prerequisites](#prerequisites)
     - [Python](#python)
@@ -16,7 +194,7 @@ Provides a fully automated build of the Oasis platform on AWS. Alternatively, th
     - [Docker Containers](#docker-containers)
 - [Licence](#licence)
 
-<!-- /TOC -->
+
 
 ## Prerequisites
 
@@ -152,3 +330,5 @@ Packages:
 
 ## License
 The code in this project is licensed under BSD 3-clause license.
+
+-->
