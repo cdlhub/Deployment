@@ -2,6 +2,10 @@
 
 ## 1. The Oasis modeling enviroment
 
+![alt text](https://github.com/OasisLMF/deployment/raw/assets/fig_oasis_environment.png )
+
+
+
 ### 1.1 Components
 ### 1.2 Optional Components
 
