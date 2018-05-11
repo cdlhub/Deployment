@@ -1,7 +1,42 @@
+# Oasis Deployment Scripts
+
+## 1. The Oasis modeling enviroment
+
+### 1.1 Components
+### 1.2 Optional Components
+
+## 2. Script Usage
+
+### 2.1 Prerequisites
+### 2.2 Examples
+
+
+# Local Deployment Guide
+
+
+## 3. Windows SQL Server Installation
+
+### 3.1 Creating an AMI
+### 3.2 Installing Fileshare Drivers
+### 3.3 SQL Server setup
+
+## 4. Linux Environment Setup
+
+### 4.1 Install requirments
+### 4.2 Configure the docker daemon
+### 4.3 Setup of File Shares
+### 4.4 Installing Flamingo
+### 4.5 Installing a model
+
+## License
+The code in this project is licensed under BSD 3-clause license.
+
+<!---
+
 # AWS
 Provides a fully automated build of the Oasis platform on AWS. Alternatively, the scripts can be used to deploy a standalone system via a more manual process.
 
-<!-- TOC depthFrom:2 -->
+
 
 - [Prerequisites](#prerequisites)
     - [Python](#python)
@@ -16,7 +51,7 @@ Provides a fully automated build of the Oasis platform on AWS. Alternatively, th
     - [Docker Containers](#docker-containers)
 - [Licence](#licence)
 
-<!-- /TOC -->
+
 
 ## Prerequisites
 
@@ -152,3 +187,5 @@ Packages:
 
 ## License
 The code in this project is licensed under BSD 3-clause license.
+
+-->
