@@ -1,0 +1,56 @@
+#!/bin/bash
+SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
+cd $SCRIPT_DIR
+
+load_config(){
+    if [ -z "$1" ]; then
+        CONF='env.config'
+    else 
+        CONF=$1
+    fi  
+    source $CONF
+    echo " --- Docker Variables ---"
+    env | grep 'UI_'
+    printf " ------------------------\n"
+    env | grep 'API_'
+    printf " ------------------------\n"
+    env | grep 'COMPOSE_'
+    printf " ------------------------\n"
+}
+
+print_help(){
+   cat <<EOF
+A wrapper script for loading model settings `env.config` which sets 
+shell variables to start the Oasis flamingo enviroment
+
+Usage:
+  oasis-service [ up | down | logs ] [config]
+
+print_help(){
+   cat <<EOF
+A wrapper script for loading model settings `env.config` which sets 
+shell variables to start the Oasis flamingo enviroment
+
+Usage:
+  oasis-service [ up | down | logs ]
+    
+EOF
+    exit 1
+}
+
+if [ "$1" == "up" ]; then
+    load_config
+    docker pull coreoasis/flamingo_shiny:$RELEASE_TAG
+    echo 'Starting Oasis'
+    docker-compose $COMPOSE_FILES up -d
+elif [ "$1" == "down" ]; then
+    load_config
+    echo 'Stopping Oasis'
+    docker-compose $COMPOSE_FILES down -v
+elif [ "$1" == "logs" ]; then
+    load_config
+    echo 'Following Oasis logs'
+    docker-compose $COMPOSE_FILES logs --tail=all
+else 
+    print_help
+fi     

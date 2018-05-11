@@ -1,0 +1,46 @@
+version: '2' 
+services:
+
+  oasis_api_server:
+    restart: always
+    image: coreoasis/oasis_api_server:${RELEASE_TAG}
+    container_name: oasis_api_server
+    ports:
+     - ${API_SERVER_PORT}:80
+    volumes:
+     - ${API_UPLOAD_PATH}:/var/www/oasis/upload:rw
+     - ${API_DOWNLOAD_PATH}:/var/www/oasis/download:rw
+    environment:
+     - RABBIT_PORT=${API_RABBIT_PORT}
+     - MYSQL_PORT=${API_MYSQL_PORT}
+
+  oasis_rabbit:
+    restart: always
+    image: rabbitmq:3-management
+    container_name: oasis_rabbit
+    ports:
+     - ${API_RABBIT_PORT}:${API_RABBIT_PORT}
+
+  oasis_mysql:
+    restart: always
+    image: mysql:5.7.22
+    container_name: oasis_mysql
+    ports:
+     - ${API_MYSQL_PORT}:${API_MYSQL_PORT}
+    environment:
+     - MYSQL_ROOT_PASSWORD=password
+     - MYSQL_USER=celery
+     - MYSQL_PASSWORD=password
+     - MYSQL_DATABASE=celery
+
+  flower:
+    restart: always
+    image: iserko/docker-celery-flower
+    container_name: flower
+    ports:
+     - 5555:5555
+    environment:
+     - CELERY_BROKER_URL=amqp://guest:guest@oasis_rabbit:${API_RABBIT_PORT}
+    entrypoint:
+     - flower
+     - --port=5555
