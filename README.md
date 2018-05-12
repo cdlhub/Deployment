@@ -59,27 +59,18 @@ git clone https://github.com/OasisLMF/AWS.git
 # Install script dependencies  
 pip install -r requirements.txt
 
-# Example AWS Values  
-AWS_PROFILE=<YOUR_AWS_ACCOUNT>
-IP_ADDRESS='10.10.0.xxx'
-INSTANCE_NAME='MS_SQL_SERVER_2014'
-VOLUME_SIZE='50'
-INSTANCE_TYPE='t2.medium'
-KEY_NAME='PrivateKeyName'
-REGION='eu-west-1'
-SECURITY_GROUP='sg-xxxxxxxx'
-SUBNET='subnet-xxxxxxxx'
-
 # Run the script
-./deploy_SQL.py --session       $AWS_PROFILE\
-                --region        $REGION\
-                --key           $KEY_NAME \
-                --securitygroup $SECURITY_GROUP \
-                --type          $INSTANCE_TYPE \
-                --size          $VOLUME_SIZE \
-                --subnet        $SUBNET \
-                --ip            $IP_ADDRESS \
-                --name          $INSTANCE_NAME
+./deploy_SQL.py --name          MS_SQL_SERVER_2014 \
+                --session       <YOUR_AWS_ACCOUNT> \
+                --ami           <AMI_ID> \
+                --snap          <SNAPSHOT_ID> \
+                --region        eu-west-1 \
+                --key           private_key_name \
+                --securitygroup sg-xxxxxxxx \
+                --type          t2.medium \
+                --size          50 \
+                --subnet        subnet-xxxxxxxx \
+                --ip            10.10.0.x \
 ```
 
 #### Creating an Ubuntu 16.04 AWS Instance
@@ -90,68 +81,39 @@ git clone https://github.com/OasisLMF/AWS.git
 # Install script dependencies  
 pip install -r requirements.txt
 
-# Example Values  
-    AWS_PROFILE=<YOUR_SESSION>
-    IP_ADDRESS='10.10.0.222'
-    INSTANCE_NAME='LINUX_OASIS_INSTALLED’
-    VOLUME_SIZE='50'
-    INSTANCE_TYPE='t2.medium'
-    KEY_NAME='MyPrivateKeyName'
-    REGION='eu-west-1'
-    SECURITY_GROUP='sg-1d8c277b'
-    SUBNET='subnet-b4eaa8c2'
-
-    # SQL server connection Values
-    SQL_IP='10.10.0.111'
-    SQL_SA_PASSWORD='Test1234'
-    SQL_ENV_NAME='piwind'
-    SQL_ENV_PASS='piwind'
-    SQL_ENV_FILES_LOC='C:/flamingo_share/Files'
-
-    # Oasis Core & UI
-    OASIS_VERSION=0.391.2
-    FLAMINGO_RELEASE_TAG=$OASIS_VERSION
-    SHINY_ENV_FILES_LOC='/var/www/oasis/Files'  
-    ENV_VERSION=$OASIS_VERSION
-    OASIS_RELEASE_TAG=$OASIS_VERSION
-    OASIS_API_IP=$IP_ADDRESS
-    OASIS_API_PORT='8001'
-
-    # Model Deployment
-    MODEL_VERSION='PiWind'
-    MODEL_SUPPLIER='OasisLMF'
-    KEYS_SERVICE_IP=$IP_ADDRESS
-    KEYS_SERVICE_PORT='9001'
-
-    # Account Credentials
-    GIT_USER=some_git_user
-    GIT_PASSWORD=pass
-    DOCKER_USER=some_docker_user
-    DOCKER_PASSWORD=pass
-
 # Run the script
-./deploy_OASIS.py --session $AWS_PROFILE \
-                  --region $REGION\
-                  --size $VOLUME_SIZE\
-                  --key $KEY_NAME\
-                  --securitygroup $SECURITY_GROUP \
-                  --type $INSTANCE_TYPE \
-                  --subnet $SUBNET \
-                  --ip $IP_ADDRESS \
-                  --name $INSTANCE_NAME\
-                  --sqlip $SQL_IP \
-                  --sqlsapass $SQL_SA_PASSWORD \
-                  --sqlenvname $SQL_ENV_NAME \
-                  --sqlenvpass $SQL_ENV_PASS\
-                  --sqlenvfilesloc $SQL_ENV_FILES_LOC\
-                  --shinyenvfilesloc $SHINY_ENV_FILES_LOC\
-                  --envversion $ENV_VERSION \
-                  --keysip $KEYS_SERVICE_IP \
-                  --keysport $KEYS_SERVICE_PORT\
-                  --gituser $GIT_USER\
-                  --gitpassword $GIT_PASSWORD\
-                  --dockeruser $DOCKER_USER\
-                  --dockerpassword $DOCKER_PASSWORD
+./deploy_OASIS.py --name                LINUX_OASIS_INSTALLED \
+                  --session             <YOUR_SESSION> \
+                  --ami                 ami-6f823312 \
+                  --region              eu-west-1 \
+                  --size                50 \
+                  --key                 private_key_name \
+                  --securitygroup       sg-xxxxxxxx \
+                  --type                t2.medium \
+                  --subnet              subnet-xxxxxxxx \
+                  --ip                  10.10.0.xxx \
+
+                  --sqlip               10.10.0.x \
+                  --sqlsapass           Test1234 \
+                  --sqlenvname          piwind \
+                  --sqlenvpass          piwind \
+                  --sqlenvfilesloc      C:/flamingo_share/Files \
+                  --shinyenvfilesloc    /var/www/oasis/Files   \
+
+                  --envversion          0.392.1 \
+                  --oasisreleasetag     0.392.1 \
+                  --flamingoreleasetag  0.392.1 \
+                  --keysip              $IP_ADDRESS \
+                  --keysport            9001 \
+                  --oasisapiip          10.10.0.xxx \
+                  --oasisapiport        8001 \
+                  --modelsupplier       OasisLMF \
+                  --modelversion        PiWind \
+
+                  --gituser             some_git_user \
+                  --gitpassword         *******  \
+                  --dockeruser          some_docker_user \
+                  --dockerpassword      ******* \
 ```
 
 # Local Deployment Guide
