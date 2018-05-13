@@ -1,10 +1,11 @@
 # Oasis Deployment Scripts
+<!--
 - [1 The Oasis environment](#1-The-Oasis-environment)
 - [2 Script Usage](#2-Script-Usage)
 - [3 Windows SQL Server Installation](#3-Windows SQL-Server-Installation)
 - [4 Linux Environment Setup](#4-Linux-Environment-Setup)
 - [Licence](#licence)
-
+--> 
 
 ## 1 The Oasis environment
 
