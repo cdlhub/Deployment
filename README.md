@@ -14,16 +14,11 @@ This guide will focus in on a *base case* deployment, which is the minimal set o
 
 All of the core component images are publicly available on Docker Hub:
 
->  [coreoasis/shiny_proxy](https://hub.docker.com/r/coreoasis/shiny_proxy) UI Front end, A web application for statistical computing and data visualization. 
-
->  [coreoasis/flamingo_server](https://hub.docker.com/r/coreoasis/flamingo_server) UI Backend and exposure management server.
-
->  [coreoasis/oasis_api_server](https://hub.docker.com/r/coreoasis/oasis_api_server)  Task scheduling API for model execution.
-
->  [coreoasis/model_execution_worker](https://hub.docker.com/r/coreoasis/model_execution_worker) A container for running loss analysis using the Oasis Ktools framework.
-
->  [coreoasis/piwind_keys_server](https://hub.docker.com/r/coreoasis/piwind_keys_server) Data lookup service, specific to each model.
-
+* [coreoasis/shiny_proxy](https://hub.docker.com/r/coreoasis/shiny_proxy) UI Front end, A web application for statistical computing and data visualization. 
+* [coreoasis/flamingo_server](https://hub.docker.com/r/coreoasis/flamingo_server) UI Backend and exposure management server.
+* [coreoasis/oasis_api_server](https://hub.docker.com/r/coreoasis/oasis_api_server)  Task scheduling API for model execution.
+* [coreoasis/model_execution_worker](https://hub.docker.com/r/coreoasis/model_execution_worker) A container for running loss analysis using the Oasis Ktools framework.
+* [coreoasis/piwind_keys_server](https://hub.docker.com/r/coreoasis/piwind_keys_server) Data lookup service, specific to each model.
 
 <!--- ### 1.2 Optional Components -->
 
@@ -34,7 +29,6 @@ To create an AWS Oasis base environment you will need to run two scripts in the 
 
 ### 2.1 Prerequisites
 * The scripts are being run from a linux machine. While it might be possible to run from windows that scenario is not covered by this document.
-
 * The target AWS account has the desired VPC, subnet, Gateway, Security Group and KeyPair setup. If not, then see the `Network infrastructure` section of AWS deployment scripts readme.
 
 ### 2.2 Examples
@@ -134,10 +128,7 @@ From AWS create an instance based on the AMI: `Windows_Server-2012-R2_RTM-Englis
 #### Create File Share
 * Create a directory for mounting to the Linux host which will run the Flamingo server docker image. We usually default to using `C:\flamingo_share`. 
 * Set this directory as a private network share and give full access to a new user flamingo
-```
-username=<FLAMINGO_SHARE_USER>
-password=<FLAMINGO_SHARE_PASSWORD>
-```
+ with `username=<FLAMINGO_SHARE_USER>` and `password=<FLAMINGO_SHARE_PASSWORD>`
 
 #### Allow sa remote connection to SQL Server
 * Use SQL Server Management Studio to connect to your database server using Windows Authentication with Administrator user.
@@ -154,11 +145,119 @@ password=<FLAMINGO_SHARE_PASSWORD>
 
 ## 4. Linux Environment Setup
 
+> **Prerequisite:** The windows SQL server running the Flamingo datastore  must be running and accessible.
+
+The following section will step though the deploy of an example oasis environment, see fig 1, and is equivalent to running [mid_system-init-ubuntu.sh](https://github.com/OasisLMF/deployment/blob/master/shell-scripts/mid_system-init-ubuntu.sh). 
 ### 4.1 Install requirments
-### 4.2 Configure the docker daemon
-### 4.3 Setup of File Shares
-### 4.4 Installing Flamingo
-### 4.5 Installing a model
+This subsection is **specific to Ubuntu 16.04**. In order to adapt the deployment to another distribution you will need to install the the following:
+* [docker-ce](https://docs.docker.com/install/)
+* [cifs-utils](https://github.com/Distrotech/cifs-utils)
+* [mssql-tools](https://docs.microsoft.com/en-us/sql/linux/sql-server-linux-setup-tools)
+* [unixodbc-dev](http://www.unixodbc.org/)
+
+```
+# Update OS && Install Docker
+curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo apt-key add -
+sudo add-apt-repository "deb [arch=amd64] https://download.docker.com/linux/ubuntu xenial stable"
+sudo apt-get update && sudo apt-get upgrade
+sudo apt-get install -y apt-transport-https ca-certificates curl software-properties-common
+sudo apt-get -y install docker-ce
+
+# Install Samba mount and DB utils
+sudo apt-get install -y cifs-utils
+
+# Install NTFS mount
+sudo apt-get install nfs-common
+
+
+# mssql-tools to access SQL Server database from Linux
+curl https://packages.microsoft.com/keys/microsoft.asc | sudo apt-key add -
+curl https://packages.microsoft.com/config/ubuntu/16.04/prod.list | sudo tee /etc/apt/sources.list.d/msprod.list
+sudo apt-get update
+sudo apt-get install mssql-tools unixodbc-dev
+
+echo 'export PATH="$PATH:/opt/mssql-tools/bin"' >> ~/.bash_profile
+echo 'export PATH="$PATH:/opt/mssql-tools/bin"' >> ~/.bashrc
+echo 'export PATH="$PATH:/opt/mssql-tools/bin"' | sudo tee --append /root/.bash_profile
+echo 'export PATH="$PATH:/opt/mssql-tools/bin"' | sudo tee --append /root/.bashrc
+
+. ~/.bashrc
+```
+
+### 4.2 Install Flamingo
+
+#### Setup the Shared files
+we need to mount the shared directory from the windows instance which we set to `C:\flamingo_share`
+using the flamingo share account. `username=<FLAMINGO_SHARE_USER>` and `password=<FLAMINGO_SHARE_PASSWORD>`
+```
+# Create Fileshares mount points
+mkdir ~/download ~/upload ~/model_data ~/flamingo_share
+
+echo "username=<FLAMINGO_SHARE_USER>" > ~/.flamingo_share_credentials
+echo "password=<FLAMINGO_SHARE_PASSWORD>" >> ~/.flamingo_share_credentials
+chmod 600 ~/.flamingo_share_credentials
+
+echo "//<SQL_IP>/flamingo_share ${HOME}/flamingo_share cifs uid=1000,gid=1000,rw,credentials=${HOME}/.flamingo_share_credentials,iocharset=utf8,dir_mode=0775,noperm,sec=ntlm 0 0" >> /etc/fstab
+
+# Reload /etc/fstab
+sudo mount -a
+```
+
+#### Clone the Flamingo UI repistory
+```
+cd ~/
+git clone https://github.com/OasisLMF/Flamingo.git
+```
+
+#### Copy the Flamingo share directory struture
+```
+# copy necessary Oasis environment files from git directories to local directories
+cp -rf ~/Flamingo/Files ~/flamingo_share/
+```
+
+#### create the Flamingo database
+The git repoistory we just cloned has a database setup script to initialize the SQL server
+```
+cd ~/Flamingo/SQLFiles
+python create_db.py --sql_server_ip=10.10.0.50\
+                        --sa_password=Test1234\
+                        --environment_name=piwind\
+                        --login_password=piwind\
+                        --file_location_sql_server=C:/flamingo_share/Files\
+                        --file_location_shiny=/var/www/oasis/Files\
+                        --version=0.392.1
+```
+
+### 4.3 Installing a model
+The example base oasis environment only adds PiWind, but the steps used to install it also apply to other models.
+
+#### Clone the model Repistory 
+```
+cd ~/
+git clone https://github.com/OasisLMF/OasisPiWind.git 
+```
+
+#### Copy model files to the Flamingo Fileshare
+```
+cp -rf ~/OasisPiWind/flamingo/PiWind/Files/TransformationFiles/*.* ~/flamingo_share/Files/TransformationFiles/
+cp -rf ~/OasisPiWind/flamingo/PiWind/Files/ValidationFiles/*.* ~/flamingo_share/Files/ValidationFiles/
+```
+
+#### Loading PiWind to the Flamingo Database
+```
+cd ~/OasisPiWind/flamingo/PiWind/SQLFiles/
+
+python load_data.py --sql_server_ip=10.10.0.50\
+                    --environment_name=piwind\
+                    --login_password=piwind\
+                    --keys_service_ip=10.10.0.41\
+                    --keys_service_port=8001\
+                    --oasis_api_ip=10.10.0.41\
+                    --oasis_api_port=9003
+```
+
+
+### Docker Configuration
 
 ## License
 The code in this project is licensed under BSD 3-clause license.
