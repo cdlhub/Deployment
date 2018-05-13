@@ -1,57 +1,48 @@
 # Oasis Deployment Scripts
-
 ## 1. The Oasis modeling enviroment
+
+This guide will focus in on a *base case* deployment, which is the minimal set of docker containers required to run the example Oasis windstorm model [PiWind](https://github.com/OasisLMF/OasisPiWind). 
 
 ![alt text](https://github.com/OasisLMF/deployment/raw/assets/fig_oasis_environment.png )
 
 
+**Windows Server** The flamingo_server docker image requires [Microsoft SQL server 2016](https://www.microsoft.com/en-gb/sql-server/sql-server-2016) for data storage and transformation. This is based on a standard AMI hosted on AWS with some additional drives for Network mounting a directory to a linux server.
 
-### 1.1 Components
-The Oasis platform is modularized using docker containers. The use of docker containers provides a mechanism for deploying a library of risk models and options for scaling out the platform, as well as portability between Linux distributions on the host servers. This guide will focus in on a *base case* deployment, which is the minimal set of docker containers required to run the Oasis example catastrophe loss model PiWind.
+**Linux Server** he host (or hosts) for running the OasisLMF docker containers. The main requirement is that the system can run docker images, so its kernel Version must be 3.10 or higher.
 
-#### Linux Server
-A host (or hosts) which meets the system requirements for running docker, for example it must be running Version 3.10 or higher of the Linux kernel.
+**Docker Images** The Oasis platform is modularized using containers. Docker provides a mechanism for deploying a library of risk models and options for scaling out the platform, as well as portability between Linux distributions on the host servers. 
 
+All of the core component images are publicly available on Docker Hub:
 
-#### Windows Server
-The flamingo_server docker image requires Microsoft SQL server 2016 for data storage and transformation.
+>  [coreoasis/shiny_proxy](https://hub.docker.com/r/coreoasis/shiny_proxy) UI Front end, A web application for statistical computing and data visualization. 
 
-#### Docker Images
-All of the core components required for an example deployment are publicly available on Docker Hub.
+>  [coreoasis/flamingo_server](https://hub.docker.com/r/coreoasis/flamingo_server) UI Backend and exposure management server.
 
+>  [coreoasis/oasis_api_server](https://hub.docker.com/r/coreoasis/oasis_api_server)  Task scheduling API for model execution.
 
->  [coreoasis/shiny_proxy](https://hub.docker.com/r/coreoasis/shiny_proxy)
+>  [coreoasis/model_execution_worker](https://hub.docker.com/r/coreoasis/model_execution_worker) A container for running loss analysis using the Oasis Ktools framework.
 
-
->  [coreoasis/flamingo_server](https://hub.docker.com/r/coreoasis/flamingo_server)
-
-
->  [coreoasis/oasis_api_server](https://hub.docker.com/r/coreoasis/oasis_api_server)
-
->  [coreoasis/model_execution_worker](https://hub.docker.com/r/coreoasis/model_execution_worker)
-
->  [coreoasis/piwind_keys_server](https://hub.docker.com/r/coreoasis/piwind_keys_server)
+>  [coreoasis/piwind_keys_server](https://hub.docker.com/r/coreoasis/piwind_keys_server) Data lookup service, specific to each model.
 
 
 <!--- ### 1.2 Optional Components -->
 
 ## 2. Script Usage
-There are cloud deployment scripts which semi-automates these sections to create Oasis base environments. Which can then be configured to run more sophisticated Insurance loss models.
-
-Deployment is split into two scripts, one per AWS instance type, see fig 1.
-* SQLPublic.py for the windows SQL server
-* Flamingo_Midtier_CalcBE.py Creates the linux instance
+To create an AWS Oasis base environment you will need to run two scripts in the following order.
+* [deploy_SQL.py](https://github.com/OasisLMF/deployment/blob/master/deploy_SQL.py) creates a windows SQL server based on a preconfigured AMI.
+* [deploy_OASIS.py](https://github.com/OasisLMF/deployment/blob/master/deploy_OASIS.py) launches a stock linux AMI, then injects and runs an installation.
 
 ### 2.1 Prerequisites
 * The scripts are being run from a linux machine. While it might be possible to run from windows that scenario is not covered by this document.
 
 * The target AWS account has the desired VPC, subnet, Gateway, Security Group and KeyPair setup. If not, then see the `Network infrastructure` section of AWS deployment scripts readme.
 
-* The AWS account has an AMI for the Windows SQL server, as outlined in section 2.1
-
 ### 2.2 Examples
 
 #### Creating a Windows AWS Instance
+
+> **Note:** This script assumes you have create an AWS Image by following the steps in [section 3.]() which you pass it using **--ami <Image_ID>** 
+
 ```
 # Clone script repository
 git clone https://github.com/OasisLMF/AWS.git
@@ -62,7 +53,7 @@ pip install -r requirements.txt
 # Run the script
 ./deploy_SQL.py --name          MS_SQL_SERVER_2014 \
                 --session       <YOUR_AWS_ACCOUNT> \
-                --ami           <AMI_ID> \
+                --ami           <IMAGE_ID> \
                 --snap          <SNAPSHOT_ID> \
                 --region        eu-west-1 \
                 --key           private_key_name \
@@ -74,6 +65,14 @@ pip install -r requirements.txt
 ```
 
 #### Creating an Ubuntu 16.04 AWS Instance
+
+> **Note:** Wait for the Windows server to fully initialize before running the MidTier script, which will create database tables and stored procedures. 
+
+This script automates the steps from [Linux Envrioment]() Section of the local installation guide.
+* Install docker-ce and other dependencies.
+* Deploy Flamingo, create its Database and file share
+* Add the PiWind model
+* Configure and run Docker.
 ```
 # Clone script repository
 git clone https://github.com/OasisLMF/AWS.git
@@ -118,12 +117,40 @@ pip install -r requirements.txt
 
 # Local Deployment Guide
 
-
 ## 3. Windows SQL Server Installation
 
-### 3.1 Creating an AMI
+### 3.1 Create an AMI
+
+From AWS create an instance based on the AMI: `Windows_Server-2012-R2_RTM-English-64Bit-SQL_2016_SP1_Web`, once its running:
+* Set the Admin Password
+* Connect via RDP 
+
 ### 3.2 Installing Fileshare Drivers
-### 3.3 SQL Server setup
+* Update Windows
+* Install [Microsoft Access Database Engine 2010 (x64)](https://www.microsoft.com/en-US/download/details.aspx?id=13255).
+* Update [SSMS](https://docs.microsoft.com/en-us/sql/ssms/download-sql-server-management-studio-ssms?view=sql-server-2017) to the latest version.
+
+### 3.2 Configuration
+#### Create File Share
+* Create a directory for mounting to the Linux host which will run the Flamingo server docker image. We usually default to using `C:\flamingo_share`. 
+* Set this directory as a private network share and give full access to a new user flamingo
+```
+username=<FLAMINGO_SHARE_USER>
+password=<FLAMINGO_SHARE_PASSWORD>
+```
+
+#### Allow sa remote connection to SQL Server
+* Use SQL Server Management Studio to connect to your database server using Windows Authentication with Administrator user.
+* Expand the Security and Logins groups, and open sa account properties.
+* On the default screen (General) set a new Password as you see fit. Save it for database access from repository scripts.
+* Select the Status screen on the left, and set the Login: option to Enabled
+* Right-click the root node (this will name your SQL server) and select Properties.
+* Select the Security screen on the left, and set Server authentication to SQL Server and Windows Authentication mode.
+* From Services program, restart SQL Server (MSSQLSERVER) service.
+
+#### Save as AMI
+* Create an image from your instance (Actions menu), and note the AMI to use in the deploy_SQL.py script.
+
 
 ## 4. Linux Environment Setup
 
