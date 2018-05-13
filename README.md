@@ -1,5 +1,12 @@
 # Oasis Deployment Scripts
-## 1. The Oasis modeling enviroment
+- [1 The Oasis environment](#1-The-Oasis-environment)
+- [2 Script Usage](#2-Script-Usage)
+- [3 Windows SQL Server Installation](#3-Windows SQL-Server-Installation)
+- [4 Linux Environment Setup](#4-Linux-Environment-Setup)
+- [Licence](#licence)
+
+
+## 1 The Oasis environment
 
 This guide will focus in on a *base case* deployment, which is the minimal set of docker containers required to run the example Oasis windstorm model [PiWind](https://github.com/OasisLMF/OasisPiWind). 
 
@@ -22,7 +29,7 @@ All of the core component images are publicly available on Docker Hub:
 
 <!--- ### 1.2 Optional Components -->
 
-## 2. Script Usage
+## 2 Script Usage
 To create an AWS Oasis base environment you will need to run two scripts in the following order.
 * [deploy_SQL.py](https://github.com/OasisLMF/deployment/blob/master/deploy_SQL.py) creates a windows SQL server based on a preconfigured AMI.
 * [deploy_OASIS.py](https://github.com/OasisLMF/deployment/blob/master/deploy_OASIS.py) launches a stock linux AMI, then injects and runs an installation.
@@ -35,7 +42,7 @@ To create an AWS Oasis base environment you will need to run two scripts in the 
 
 #### Creating a Windows AWS Instance
 
-> **Note:** This script assumes you have create an AWS Image by following the steps in [section 3.]() which you pass it using **--ami <Image_ID>** 
+> **Note:** This script assumes you have create an AWS Image by following the steps in [section 3](#3-Windows SQL-Server-Installation) which you pass it using **--ami <Image_ID>** 
 
 ```
 # Clone script repository
@@ -111,15 +118,15 @@ pip install -r requirements.txt
 
 # Local Deployment Guide
 
-## 3. Windows SQL Server Installation
+## 3 Windows SQL Server Installation
 
-### 3.1 Create an AMI
+### 3.1 Launch a Windows AWS instance
 
 From AWS create an instance based on the AMI: `Windows_Server-2012-R2_RTM-English-64Bit-SQL_2016_SP1_Web`, once its running:
 * Set the Admin Password
 * Connect via RDP 
 
-### 3.2 Installing Fileshare Drivers
+### 3.2 Install drivers
 * Update Windows
 * Install [Microsoft Access Database Engine 2010 (x64)](https://www.microsoft.com/en-US/download/details.aspx?id=13255).
 * Update [SSMS](https://docs.microsoft.com/en-us/sql/ssms/download-sql-server-management-studio-ssms?view=sql-server-2017) to the latest version.
@@ -143,13 +150,13 @@ From AWS create an instance based on the AMI: `Windows_Server-2012-R2_RTM-Englis
 * Create an image from your instance (Actions menu), and note the AMI to use in the deploy_SQL.py script.
 
 
-## 4. Linux Environment Setup
+## 4 Linux Environment Setup
 
 > **Prerequisite:** The windows SQL server running the Flamingo datastore  must be running and accessible.
 
 The following section will step though the deploy of an example oasis environment, see fig 1, and is equivalent to running [mid_system-init-ubuntu.sh](https://github.com/OasisLMF/deployment/blob/master/shell-scripts/mid_system-init-ubuntu.sh). 
 ### 4.1 Install requirments
-This subsection is **specific to Ubuntu 16.04**. In order to adapt the deployment to another distribution you will need to install the the following:
+This subsection is **specific to Ubuntu 16.04**. In order to adapt the deployment to another distribution you will need to install the following:
 * [docker-ce](https://docs.docker.com/install/)
 * [cifs-utils](https://github.com/Distrotech/cifs-utils)
 * [mssql-tools](https://docs.microsoft.com/en-us/sql/linux/sql-server-linux-setup-tools)
@@ -163,12 +170,16 @@ sudo apt-get update && sudo apt-get upgrade
 sudo apt-get install -y apt-transport-https ca-certificates curl software-properties-common
 sudo apt-get -y install docker-ce
 
+# Docker post install tasks
+sudo usermod -aG docker $USER
+sudo systemctl enable docker
+docker login -u <DOCKER_USER> -p <DOCKER_PASSWORD>
+
 # Install Samba mount and DB utils
 sudo apt-get install -y cifs-utils
 
 # Install NTFS mount
 sudo apt-get install nfs-common
-
 
 # mssql-tools to access SQL Server database from Linux
 curl https://packages.microsoft.com/keys/microsoft.asc | sudo apt-key add -
@@ -203,20 +214,20 @@ echo "//<SQL_IP>/flamingo_share ${HOME}/flamingo_share cifs uid=1000,gid=1000,rw
 sudo mount -a
 ```
 
-#### Clone the Flamingo UI repistory
+#### Clone the Flamingo UI repository
 ```
 cd ~/
 git clone https://github.com/OasisLMF/Flamingo.git
 ```
 
-#### Copy the Flamingo share directory struture
+#### Copy the Flamingo share directory structure
 ```
 # copy necessary Oasis environment files from git directories to local directories
 cp -rf ~/Flamingo/Files ~/flamingo_share/
 ```
 
 #### create the Flamingo database
-The git repoistory we just cloned has a database setup script to initialize the SQL server
+The git repository we just cloned has a database setup script to initialize the SQL server
 ```
 cd ~/Flamingo/SQLFiles
 python create_db.py --sql_server_ip=10.10.0.50\
@@ -231,13 +242,13 @@ python create_db.py --sql_server_ip=10.10.0.50\
 ### 4.3 Installing a model
 The example base oasis environment only adds PiWind, but the steps used to install it also apply to other models.
 
-#### Clone the model Repistory 
+#### Clone the model Repository 
 ```
 cd ~/
 git clone https://github.com/OasisLMF/OasisPiWind.git 
 ```
 
-#### Copy model files to the Flamingo Fileshare
+#### Copy model files to the Flamingo file share
 ```
 cp -rf ~/OasisPiWind/flamingo/PiWind/Files/TransformationFiles/*.* ~/flamingo_share/Files/TransformationFiles/
 cp -rf ~/OasisPiWind/flamingo/PiWind/Files/ValidationFiles/*.* ~/flamingo_share/Files/ValidationFiles/
@@ -257,166 +268,46 @@ python load_data.py --sql_server_ip=10.10.0.50\
 ```
 
 
-### Docker Configuration
+### 4.4 Docker Configuration
+
+#### Edit the Docker daemon port
+ShinyProxy needs to connect to the docker daemon to spin up the containers. By default ShinyProxy will do so on port 2375 of the docker host.
+See [Shiny Proxy - Getting started](https://www.shinyproxy.io/getting-started/#docker-startup-options) for more details. 
+```
+# Tweak the Docker daemon port
+REPLACE='ExecStart=/usr/bin/dockerd -H fd:// -D -H tcp://0.0.0.0:2375'
+sudo sed -i "/ExecStart=/c$REPLACE" /lib/systemd/system/docker.service
+
+/lib/systemd/system/docker.service
+systemctl daemon-reload
+systemctl start docker
+```
+
+#### Install Docker-Compose 
+```
+# install Docker-Compose
+curl -L https://github.com/docker/compose/releases/download/1.14.0/docker-compose-`uname -s`-`uname -m` > /usr/local/bin/docker-compose
+chmod +x /usr/local/bin/docker-compose
+```
+
+#### Run the Oasis Containers
+
+Copy the example Yml files from this repository and edit the file [env.config](https://github.com/OasisLMF/deployment/blob/master/compose/env.config)
+so its values match the various usernames, passwords, dirs, ports and IP addresses specific to an installation. Then run the helper script `oasis-service` to spin up the Oasis containers.
+```
+git clone https://github.com/OasisLMF/deployment.git
+cp -r ./deployment/compose ~/
+
+# --  Edit the Shell Variables -- #
+
+#run the oasis containers 
+~/compose/oasis-service up 
+```
+
+Alternatively, you can edit the yml files directly and run docker compose.
+```
+docker-compose -f api.yml -f flamingo.yml -f PiWind_model.yml up -d 
+```
 
 ## License
 The code in this project is licensed under BSD 3-clause license.
-
-<!---
-
-# AWS
-Provides a fully automated build of the Oasis platform on AWS. Alternatively, the scripts can be used to deploy a standalone system via a more manual process.
-
-
-
-- [Prerequisites](#prerequisites)
-    - [Python](#python)
-    - [AWS](#aws)
-    - [Github and Dockerhub](#github-and-dockerhub)
-    - [SQL Server AMI](#sql-server-ami)
-- [Dependencies](#dependencies)
-- [Configuration](#configuration)
-- [Documentation](#documentation)
-    - [Flamingo Server Configuration](#flamingo-server-configuration)
-    - [OASIS Environment Directories](#oasis-environment-directories)
-    - [Docker Containers](#docker-containers)
-- [Licence](#licence)
-
-
-
-## Prerequisites
-
-### Python
-
-Minimum version of Python is 3.2 (from [pyqver](https://github.com/ghewgill/pyqver)).
-
-### AWS
-
-You need the [AWS CLI](https://aws.amazon.com/cli/?nc1=f_ls) installed. Most options depend on your AWS setup. You can configure the AWS `credentials` file – located at `~/.aws/credentials` on Linux, macOS, or Unix, or at `C:\Users\USERNAME\.aws\credentials` on Windows. This file can contain multiple named profiles in addition to a default profile.
-
-### Github and Dockerhub
-
-You need a GitHub account and a Dockerhub account with access to private OASISLMF repositories and docker images.
-
-### SQL Server AMI
-
-You need to have a SQL Server AMI based on preconfigured SQL server on Windows, that has the necessary configuraton on the SQL server for the Oasis environment.
-
-Follow these steps to configure your SQL Server AMI:
-
-**Network infrastructure:**
-
-1. Create a VPC. For instance:
-    - CIDR: `10.0.0.0/16`
-    - DNS resolution: yes
-    - DNS hostnames: no
-1. Create subnet  and a subnet for your Flamingo installation. For instance:
-    - CIDR: `10.0.1.0/24`
-    - Auto-assign Public IP: yes (_Subnet Actions_ menu)
-1. Create Internet Gateway for the VPC, and attach it the the VPC (_Actions_ menu).
-1. Add route to the Internet gateway to subnet route table with destination `0.0.0.0/0`.
-1. Create Security Group for Remote Desktop Connection:
-    - Type: RDP
-    - Protocol: TCP
-    - Port Range: `3389`
-    - Source: `0.0.0.0/0` (all Internet)
-1. Create Security Group for SQL Server and file sharing:
-    ![SQL Server and file sharing security group](doc/pics/sql-server-and-file-sharing-security-group.png)
-
-**SQL Server AMI:**
-
-1. Create EC2 instance from Community AMIs: Windows_Server-2012-R2_RTM-English-64Bit-SQL_2016_SP1_Web:
-    - Type: _t2.medium_
-    - Volume: _50GB SSD gp2 not encrypted_
-    - IAM: no role
-    - Security groups: select the two security groups for RDP connection, SQL server and file sharing.
-1. Get Windows Password (_Actions_ menu) for _Administrator_ user. Keep it safe for later AMI instance access.
-2. Launch SQL Server instance and connect to it from your local machine with Microsoft Remote Desktop.
-3. Run Update Windows.
-4. Download and install [Microsoft Access Database Engine 2010 (x64)](https://www.microsoft.com/en-US/download/details.aspx?id=13255).
-5. Create `flamingo_share` directory under `C:\`, and setup file share:
-    - Do not turn share on public network, only private.
-    - Add a new user `flamingo`/_password_ to full access list.
-6. [Update SSMS](https://docs.microsoft.com/en-us/sql/ssms/download-sql-server-management-studio-ssms?view=sql-server-2017) with latest version.
-7. Allow _sa_ remote connection to SQL Server:
-    - Use SQL Server Management Studio to connect to your database server using Windows Authentication with _Administrator_ user.
-    - Expand the _Security_ and _Logins_ groups, and open _sa_ account properties.
-    - On the default screen (_General_) set a new _Password_ as you see fit. Save it for database access from repository scripts.
-    - Select the _Status_ screen on the left, and set the _Login:_ option to _Enabled_.
-    - Right-click the root node (this will name your SQL server) and select _Properties_.
-    - Select the _Security_ screen on the left, and set _Server authentication_ to _SQL Server and Windows Authentication mode_.
-    - From _Services_ program, restart _SQL Server (MSSQLSERVER)_ service.
-10. Create an image from your instance (_Actions_ menu).
-
-## Dependencies
-
-- [Boto3](https://github.com/boto/boto3).
-
-Don't forget to add new dependencies to requirement file:
-
-```sh
-pip freeze > requirements.txt
-```
-
-## Configuration
-
-This package uses `virtualenv` to configure Python dependencies. After cloning the repository you can install a virtual environment from the command line:
-
-```sh
-virtualenv -p python3 env
-```
-
-Then, activate the virtual environment and install depedencies:
-
-```sh
-source env/bin/activate
-pip install -r requirements.txt
-```
-
-## Documentation
-
-- `SQLPublic.py` creates a SQL Server instance based on private preconfigured AMI.
-- `Flamingo_Midtier_CalcBE.py` creates Flamingo server from CentOS public AMI. It depends on SQL Server and must be run after `SQLPublic.py`. It uses startup script to configure Flamingo components:
-    - Flamingo Shiny server from docker image.
-    - Midtiers from docker images.
-    - Shared folder with SQL Server.
-
-### Flamingo Server Configuration
-
-
-All operations are done under `centos` user.
-
-Packages:
-- Docker CE
-- Docker Compose
-- CIFS tools in order to access SQL Server shared directory (the SMB/CIFS protocol is a standard file sharing protocol widely deployed on Microsoft Windows machines.)
-- `mssql-tools` to access SQL Server database from Linux.
-
-### OASIS Environment Directories
-
-- `/home/centos/download`
-- `/home/centos/upload`
-- `/home/centos/model_data`
-- `/home/centos/flamingo_share`: Shared directory with SQL Server instance.
-- `/home/centos/.flamingo_share_credentials`: Credentials for `cifs` tools to mount SQL Server `flamingo_share` directory at `/home/centos/flamingo_share`.
-- `/home/centos/Flamingo/Files`: Directory structure skeleton for SQL Server. Its content (empty directories) is copied to SQL Server `flamingo_share` directory.
-
-1. Copy transformation and validation files, and model files to SQL Server shared directory.
-1. Create SQL Server DB. Uses `Flamingo/SQLFiles/aws_create_db.py` script to create SQL Server database.
-2. Upload PiWind data to SQL Server (`PiWind/SQLFiles/load_data.py`).
-4. Run docker container `coreoasis/flamingo_shiny`. It is configured using [`Dockerfile.flamingo_shiny`](https://github.com/OasisLMF/Flamingo/blob/master/Dockerfile.flamingo_shiny). It contains the Flamingo web app from [`BFE_RShiny`](https://github.com/OasisLMF/Flamingo/tree/master/BFE_RShiny) directory.
-5. Compose with containers:
-    - `/home/centos/Flamingo/build/flamingo.yml`
-    - `/home/centos/OasisApi/build/oasisapi.yml`
-    - `/home/centos/OasisApi/build/oasisworker.yml`
-    - `/home/centos/OasisPiWind/build/oasispiwindkeysserver.yml`
-
-### Docker Containers
-
-- ShinyProxy: [ShinyProxy](https://www.shinyproxy.io/) is used to deploy Shiny apps.
-- Flamingo Server: Flamingo Shiny web app served by ShinyProxy.
-
-## License
-The code in this project is licensed under BSD 3-clause license.
-
--->
