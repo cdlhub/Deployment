@@ -65,7 +65,7 @@ pip install -r requirements.txt
 
 > **Note:** Wait for the Windows server to fully initialize before running the MidTier script, which will create database tables and stored procedures. 
 
-This script automates the steps from [Linux Envrioment]() Section of the local installation guide.
+This script automates the steps from [Linux Envrioment Setup](#Linux_Environment_Setup) Section of the local installation guide.
 * Install docker-ce and other dependencies.
 * Deploy Flamingo, create its Database and file share
 * Add the PiWind model
@@ -146,7 +146,7 @@ From AWS create an instance based on the AMI: `Windows_Server-2012-R2_RTM-Englis
 #### Save as AMI
 * Create an image from your instance (Actions menu), and note the AMI to use in the deploy_SQL.py script.
 
-### Linux Environment Setup
+### <a name="Linux_Environment_Setup"></a>Linux Environment Setup
 
 > **Prerequisite:** The windows SQL server running the Flamingo datastore  must be running and accessible.
 
