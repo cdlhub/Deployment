@@ -2,31 +2,31 @@
 
 # Deployment
 
-Automation scipts for deploying a base case Oasis platform.
-
-## Base case Oasis platform
-
-This guide will describe a base case deployment of the Oais platform, which is the minimal set required to run the example Oasis windstorm model [PiWind](https://github.com/OasisLMF/OasisPiWind). The physical set up of the environment is shown in the following figure:
-
-![alt text](https://github.com/OasisLMF/deployment/raw/assets/fig_oasis_environment.png )
-
-**Windows Server** The flamingo_server docker image requires [Microsoft SQL server 2016](https://www.microsoft.com/en-gb/sql-server/sql-server-2016) for data storage and transformation. This is based on a standard AMI hosted on AWS with some additional drives for Network mounting a directory to a linux server.
-
-**Linux Server** he host (or hosts) for running the OasisLMF docker containers. The main requirement is that the system can run docker images, so its kernel Version must be 3.10 or higher.
-
-**Docker Images** The Oasis platform is modularized using containers. Docker provides a mechanism for deploying a library of risk models and options for scaling out the platform, as well as portability between Linux distributions on the host servers. 
-
-All of the core component images are publicly available on Docker Hub:
-
-* [coreoasis/shiny_proxy](https://hub.docker.com/r/coreoasis/shiny_proxy) UI Front end, A web application for statistical computing and data visualization. 
-* [coreoasis/flamingo_server](https://hub.docker.com/r/coreoasis/flamingo_server) UI Backend and exposure management server.
-* [coreoasis/oasis_api_server](https://hub.docker.com/r/coreoasis/oasis_api_server)  Task scheduling API for model execution.
-* [coreoasis/model_execution_worker](https://hub.docker.com/r/coreoasis/model_execution_worker) A container for running loss analysis using the Oasis Ktools framework.
-* [coreoasis/piwind_keys_server](https://hub.docker.com/r/coreoasis/piwind_keys_server) Data lookup service, specific to each model.
+Automation scipts for deploying a base case Oasis platform, which is the minimal set required to run the example Oasis windstorm model [PiWind](https://github.com/OasisLMF/OasisPiWind). 
 
 The deployment guide will detail two scenarios:
 1) Automated AWS deployment: this is a scripted deployment of the Oasis platform in AWS. This is the most strightforward way to set up the Oasis platform.
 2) Manual deployment on AWS: this is the manual process for building and deploying an Oasis platform. Again, we use an AWS environment for illustration but the same steps can be used as a template for installing the Oasis platform on other environmemts. 
+
+## Base case Oasis platform
+
+The physical set up of the base case environment is shown in the following figure:
+
+![alt text](https://github.com/OasisLMF/deployment/raw/assets/fig_oasis_environment.png )
+
+**Windows Server:** The flamingo_server docker image requires [Microsoft SQL server 2016](https://www.microsoft.com/en-gb/sql-server/sql-server-2016) for data storage and transformation, with some additional drives for network mounting a directory to a Linux server.
+
+**Linux Server:** The host for running the Oasis Docker containers. The main requirement is that the system can run Docker images, so the kernel version must be 3.10 or higher.
+
+**Docker Images:** The Oasis platform is modularized using containers. Docker provides a mechanism for deploying a library of risk models and options for scaling out the platform, as well as portability between Linux distributions on the host servers. 
+
+All of the core component images are publicly available on DockerHub:
+
+* [coreoasis/shiny_proxy](https://hub.docker.com/r/coreoasis/shiny_proxy) Appliucation server for Oasis UI, a browser based application for managing exposure data and operating modelling workflows.
+* [coreoasis/flamingo_server](https://hub.docker.com/r/coreoasis/flamingo_server) Services for interacting with exposure and output data.
+* [coreoasis/oasis_api_server](https://hub.docker.com/r/coreoasis/oasis_api_server) Services for uploading Oasis files, running analyses and retrieving outputs.
+* [coreoasis/model_execution_worker](https://hub.docker.com/r/coreoasis/model_execution_worker) Worker for running loss analysis using the Oasis Ktools framework.
+* [coreoasis/piwind_keys_server](https://hub.docker.com/r/coreoasis/piwind_keys_server) Model specific services for generating area peril and vulnerability keys for a particular set of exposures.
 
 <!--- ### 1.2 Optional Components -->
 
