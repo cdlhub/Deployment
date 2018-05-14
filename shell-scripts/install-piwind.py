@@ -10,7 +10,7 @@ import argparse
 import configparser
 import os
 import paramiko
-import scp
+# import scp
 
 # Read command line options
 
@@ -21,7 +21,6 @@ parser.add_argument("--host", action='store', dest='hostname', required=True, he
 parser.add_argument('--config', action='store', dest='config', default='config.ini', help='set INI configuration file name (default: config.ini)')
 parser.add_argument('--session', action='store', dest='session_profile', default='default', required=False, help='AWS profile to get credentials')
 parser.add_argument('--key', action='store', dest='key_name', required=True, help='AWS access key file name to access the instace')
-# parser.add_argument('--dryrun', action='store_true', dest='dry_run', default=False, help='flag to perform a dry run')
 parser.add_argument('--gituser', action='store', dest='git_user', required=True, help='git user name')
 parser.add_argument('--gitpassword', action='store', dest='git_password', required=True, help='git user password')
 parser.add_argument('--dockeruser', action='store', dest='docker_user', required=True, help='docker user name')
@@ -34,7 +33,7 @@ args = parser.parse_args()
 config = configparser.ConfigParser()
 config.read(args.config)
 
-# Update install script
+# Create install script from template
 
 with open ("shell-scripts/install-piwind-template.sh", "r") as f:
     lines = f.readlines()
@@ -62,12 +61,7 @@ script = script.replace("<KEYS_SERVICE_PORT>", config['PiWind']['keys_service_po
 script = script.replace("<MODEL_SUPPLIER>", config['PiWind']['model_supplier'])
 script = script.replace("<MODEL_VERSION>", config['PiWind']['model_version'])
 
-# Create isntall script
-
-with open("shell-scripts/install-piwind.sh", "w") as f:
-    f.write(script)
-
-# Setup secure connection 
+# Run install script via ssh
 
 ssh_connect = {
     "username": args.username,
@@ -79,22 +73,11 @@ ssh.load_system_host_keys()
 ssh.set_missing_host_key_policy(paramiko.AutoAddPolicy())
 ssh.connect(**ssh_connect)
 
-# Copy install script to server
-
-with scp.SCPClient(ssh.get_transport()) as copier:
-    copier.put("shell-scripts/install-piwind.sh", "install-piwind.sh")
-
-# Run install script
-
-print("Start...")
-ssh_stdin, ssh_stdout, ssh_stderr = ssh.exec_command("source install-piwind.sh; rm install-piwind.sh", get_pty=True)
+print("run install script on server...")
+ssh_stdin, ssh_stdout, ssh_stderr = ssh.exec_command(script, get_pty=True)
 
 for line in iter(ssh_stdout.readline, ""):
     print(line)
-print('finished.')
+print('...finished')
 
 ssh.close()
-
-# Delete local install script
-
-os.remove("shell-scripts/install-piwind.sh")
