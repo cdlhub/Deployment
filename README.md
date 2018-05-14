@@ -1,4 +1,6 @@
-# Oasis Deployment Scripts
+# Deployment
+
+Automation scipts for deploying a base case Oasis platform.
 
 ## Base case Oasis platform
 
