@@ -38,7 +38,7 @@ To create an AWS Oasis base environment you will need to run two scripts in the 
 
 ### Creating a Windows AWS Instance
 
-> **Note:** This script assumes you have create an AWS Image by following the steps in [Windows SQL Server Installation](Windows SQL Server Installation) which you pass it using **--ami <Image_ID>** 
+> **Note:** This script assumes you have create an AWS Image by following the steps in [Windows SQL Server Installation](#Windows_SQL_Server_Installation) which you pass it using **--ami <Image_ID>** 
 
 ```
 # Clone script repository
@@ -114,6 +114,7 @@ pip install -r requirements.txt
 
 ## Scenario 2: Manual deployment on AWS
 
+(#Windows_SQL_Server_Installation)
 ### Windows SQL Server Installation
 
 #### Launch a Windows AWS instance
