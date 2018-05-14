@@ -48,17 +48,17 @@ git clone https://github.com/OasisLMF/Deployment.git
 pip install -r requirements.txt
 
 # Run the script
-./deploy_SQL.py --name          MS_SQL_SERVER_2014 \
-                --session       <YOUR_AWS_ACCOUNT> \
+./deploy_SQL.py --name          <SQL_INSTANCE_NAME> \
+                --session       <SESSION> \
                 --ami           <IMAGE_ID> \
                 --snap          <SNAPSHOT_ID> \
                 --region        eu-west-1 \
-                --key           private_key_name \
-                --securitygroup sg-xxxxxxxx \
+                --key           <PRIVATE_KEY> \
+                --securitygroup <SECURITY_GROUP> \
                 --type          t2.medium \
                 --size          50 \
-                --subnet        subnet-xxxxxxxx \
-                --ip            10.10.0.x \
+                --subnet        <SUBNET_ID> \
+                --ip            <SQL_IP>
 ```
 
 ### Creating The Linux Instance
@@ -80,39 +80,40 @@ git clone https://github.com/OasisLMF/Deployment.git
 pip install -r requirements.txt
 
 # Run the script
-./deploy_OASIS.py --name                LINUX_OASIS_INSTALLED \
-                  --session             <YOUR_SESSION> \
-                  --ami                 ami-6f823312 \
+./deploy_OASIS.py --name                <LINUX_INSTANCE_NAME> \
+                  --session             <SESSION> \
+                  --ami                 ami-f90a4880 \
                   --region              eu-west-1 \
                   --size                50 \
-                  --key                 private_key_name \
-                  --securitygroup       sg-xxxxxxxx \
+                  --key                 <PRIVATE_KEY> \
+                  --securitygroup       <SECURITY_GROUP> \
                   --type                t2.medium \
-                  --subnet              subnet-xxxxxxxx \
-                  --ip                  10.10.0.xxx \
-
-                  --sqlip               10.10.0.x \
+                  --subnet              <SUBNET_ID> \
+                  --ip                  <LINUX_IP> \
+                  --sqlip               <SQL_IP> \
                   --sqlsapass           Test1234 \
                   --sqlenvname          piwind \
                   --sqlenvpass          piwind \
                   --sqlenvfilesloc      C:/flamingo_share/Files \
                   --shinyenvfilesloc    /var/www/oasis/Files   \
-
                   --envversion          0.392.1 \
                   --oasisreleasetag     0.392.1 \
                   --flamingoreleasetag  0.392.1 \
-                  --keysip              $IP_ADDRESS \
+                  --keysip              <LINUX_IP> \
                   --keysport            9001 \
-                  --oasisapiip          10.10.0.xxx \
+                  --oasisapiip          <LINUX_IP>\
                   --oasisapiport        8001 \
                   --modelsupplier       OasisLMF \
                   --modelversion        PiWind \
-
-                  --gituser             some_git_user \
-                  --gitpassword         *******  \
-                  --dockeruser          some_docker_user \
-                  --dockerpassword      ******* \
+                  --gituser             <GIT_USERNAME> \
+                  --gitpassword         <GIT_PASSWORD> \
+                  --dockeruser          <DOCKER_USERNAME> \
+                  --dockerpassword      <DOCKER_PASSWORD>
 ```
+
+### Testing the deployment
+
+Having ran the scripts, you should now be able to access the UI at http://<IP_ADDRESS>:8080/app/BFE_RShiny . The default login is admin/password. You can watch a [video](https://www.youtube.com/watch?v=5P95PxwSAkM) on how to run a simple analysis, and you can use the test PiWind exposure input files [here](https://github.com/OasisLMF/OasisPiWind/tree/master/tests/data/SourceFiles).
 
 ## Scenario 2: Manual deployment on AWS
 
