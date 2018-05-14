@@ -114,7 +114,7 @@ pip install -r requirements.txt
 
 ## Scenario 2: Manual deployment on AWS
 
-###<a name="Windows_SQL_Server_Installation"></a>Windows SQL Server Installation
+### <a name="Windows_SQL_Server_Installation"></a>Windows SQL Server Installation
 
 #### Launch a Windows AWS instance
 
