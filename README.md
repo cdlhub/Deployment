@@ -63,9 +63,9 @@ pip install -r requirements.txt
 
 ### Creating an Ubuntu 16.04 AWS Instance
 
-> **Note:** Wait for the Windows server to fully initialize before running the MidTier script, which will create database tables and stored procedures. 
+> **Note:** Wait for the Windows server to fully initialize before running the Oasis deployment script, which will create database tables and stored procedures. 
 
-This script automates the steps from [Linux Envrioment Setup](#Linux_Environment_Setup) Section of the local installation guide.
+This script automates the steps from [Linux Envrioment Setup](#Linux_Environment_Setup) section:
 * Install docker-ce and other dependencies.
 * Deploy Flamingo, create its Database and file share
 * Add the PiWind model
