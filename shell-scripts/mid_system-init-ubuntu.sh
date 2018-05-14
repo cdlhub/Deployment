@@ -80,29 +80,15 @@ cd /home/ubuntu
 sudo -u ubuntu git clone https://<GIT_USER>:<GIT_PASSWORD>@github.com/OasisLMF/Flamingo.git
 sudo -u ubuntu git clone https://<GIT_USER>:<GIT_PASSWORD>@github.com/OasisLMF/OasisApi.git
 
-# PIWIND
-# sudo -u ubuntu git clone https://<GIT_USER>:<GIT_PASSWORD>@github.com/OasisLMF/OasisPiWind.git
-# END PIWIND
-
 echo # copy necessary Oasis environment files from git directories to local directories
 
 cp -rf /home/ubuntu/Flamingo/Files /home/ubuntu/flamingo_share/
-
-# PIWIND
-# cp -rf /home/ubuntu/OasisPiWind/flamingo/PiWind/Files/TransformationFiles/*.* /home/ubuntu/flamingo_share/Files/TransformationFiles/
-# cp -rf /home/ubuntu/OasisPiWind/flamingo/PiWind/Files/ValidationFiles/*.* /home/ubuntu/flamingo_share/Files/ValidationFiles/
-# cp -rf /home/ubuntu/OasisPiWind/model_data/PiWind/*.* /home/ubuntu/model_data/
-# END PIWIND
 
 echo # copy generic yml files from git directories to local directories
 
 cp /home/ubuntu/Flamingo/build/flamingo.yml /home/ubuntu/
 cp /home/ubuntu/OasisApi/build/oasisapi.yml /home/ubuntu/
 cp /home/ubuntu/OasisApi/build/oasisworker.yml /home/ubuntu/
-
-# PIWIND
-# cp /home/ubuntu/OasisPiWind/build/oasispiwindkeysserver.yml /home/ubuntu/
-# END PIWIND
 
 echo ###############################################################################
 echo # install SQL server command line tools for Linux
@@ -127,26 +113,12 @@ cd /home/ubuntu/Flamingo/SQLFiles
 chmod 711 create_db.py
 ./create_db.py -s <SQL_IP> -p <SQL_SA_PASSWORD> -n <SQL_ENV_NAME> -l <SQL_ENV_PASS> -f <SQL_ENV_FILES_LOC> -F <SHINY_ENV_FILES_LOC> -v <ENV_VERSION>
 
-# PIWIND
-# echo # load model data into the Oasis environment SQL database
-
-# cd /home/ubuntu/OasisPiWind/flamingo/PiWind/SQLFiles
-# chmod 711 load_data.py
-# ./load_data.py -s <SQL_IP> -n <SQL_ENV_NAME> -l <SQL_ENV_PASS> -a <KEYS_SERVICE_IP> -A <KEYS_SERVICE_PORT> -o <OASIS_API_IP> -O <OASIS_API_PORT>
-# END PIWIND
-
 echo ###############################################################################
 echo # modify generic yml files to specific Oasis environment yml files
 
 cd /home/ubuntu
 sed -i 's/__oasis_release_tag__/<OASIS_RELEASE_TAG>/g' oasisapi.yml
 
-# PIWIND
-# sed -i 's/__oasis_release_tag__/<OASIS_RELEASE_TAG>/g' oasisworker.yml
-# sed -i 's/__ip_address__/<IP_ADDRESS>/g' oasisworker.yml
-# sed -i 's/__model_supplier__/<MODEL_SUPPLIER>/g' oasisworker.yml
-# sed -i 's/__model_version__/<MODEL_VERSION>/g' oasisworker.yml
-# END PIWIND
 sed -i 's/__flamingo_release_tag__/<FLAMINGO_RELEASE_TAG>/g' flamingo.yml
 sed -i 's/__sql_env_name__/<SQL_ENV_NAME>/g' flamingo.yml
 sed -i 's/__sql_ip__/<SQL_IP>/g' flamingo.yml
@@ -163,14 +135,7 @@ docker login -u <DOCKER_USER> -p <DOCKER_PASSWORD>
 docker pull coreoasis/flamingo_shiny:<FLAMINGO_RELEASE_TAG>
 
 # run Oasis environment specific yml files to create the Oasis environment
-
-# PIWIND
-# docker-compose -f oasispiwindkeysserver.yml up -d
-# END PIWIND
 docker-compose -f oasisapi.yml up -d
-# PIWIND
-# docker-compose -f oasisworker.yml up -d
-# END PIWIND
 docker-compose -f flamingo.yml up -d
 
 echo # DONE: provisioning Flamingo server #
