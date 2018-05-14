@@ -1,10 +1,12 @@
 <img src="https://oasislmf.org/packages/oasis_theme_package/themes/oasis_theme/assets/src/oasis-lmf-colour.png" alt="Oasis LMF logo" width="250"/>
 
-Automation scipts for deploying a base case Oasis platform, which is the minimal set required to run the example Oasis windstorm model [PiWind](https://github.com/OasisLMF/OasisPiWind). 
+# Deployment
+
+Automation scipts for deploying a base case Oasis platform, which is the minimal environment required to run the example Oasis windstorm model [PiWind](https://github.com/OasisLMF/OasisPiWind). 
 
 The deployment guide will detail two scenarios:
 1) Automated AWS deployment: this is a scripted deployment of the Oasis platform in AWS. This is the most strightforward way to set up the Oasis platform.
-2) Manual deployment on AWS: this is the manual process for building and deploying an Oasis platform. Again, we use an AWS environment for illustration but the same steps can be used as a template for installing the Oasis platform on other environmemts. 
+2) Manual deployment on AWS: this is the manual process for building and deploying an Oasis platform. Again, we use an AWS environment for illustration but the steps can be used as a template for installing the Oasis platform on other environmemts. 
 
 ## Base case Oasis platform
 
@@ -12,11 +14,9 @@ The physical set up of the base case environment is shown in the following figur
 
 ![alt text](https://github.com/OasisLMF/deployment/raw/assets/fig_oasis_environment.png )
 
-**Windows Server:** The flamingo_server docker image requires [Microsoft SQL server 2016](https://www.microsoft.com/en-gb/sql-server/sql-server-2016) for data storage and transformation, with some additional drives for network mounting a directory to a Linux server.
+**Windows Server:** The server for the Oasis UI database. This requires [Microsoft SQL server 2016](https://www.microsoft.com/en-gb/sql-server/sql-server-2016), with some additional drives for network mounting a directory to the Linux server.
 
-**Linux Server:** The host for running the Oasis Docker containers. The main requirement is that the system can run Docker images, so the kernel version must be 3.10 or higher.
-
-**Docker Images:** The Oasis platform is modularized using containers. Docker provides a mechanism for deploying a library of risk models and options for scaling out the platform, as well as portability between Linux distributions on the host servers. 
+**Linux Server:** The host for running the Oasis Docker containers. The Oasis platform is modularized using containers. Docker provides a mechanism for deploying a library of risk models and options for scaling out the platform, as well as portability between Linux distributions on the host servers. 
 
 All of the core component images are publicly available on DockerHub:
 
@@ -26,22 +26,19 @@ All of the core component images are publicly available on DockerHub:
 * [coreoasis/model_execution_worker](https://hub.docker.com/r/coreoasis/model_execution_worker) Worker for running loss analysis using the Oasis Ktools framework.
 * [coreoasis/piwind_keys_server](https://hub.docker.com/r/coreoasis/piwind_keys_server) Model specific services for generating area peril and vulnerability keys for a particular set of exposures.
 
-<!--- ### 1.2 Optional Components -->
+## Scenario 1: Automated AWS deployment
 
-## Scripts Overview
-To create an AWS Oasis base environment you will need to run two scripts in the following order.
+To create an AWS Oasis base environment you will need to run two scripts in the following order:
 * [deploy_SQL.py](https://github.com/OasisLMF/deployment/blob/master/deploy_SQL.py) creates a Windows SQL server based on a preconfigured image.
 * [deploy_OASIS.py](https://github.com/OasisLMF/deployment/blob/master/deploy_OASIS.py) launches a stock Linux AMI, then injects and runs an installation script.
 
 ### Prerequisites
-* The scripts are being run from a linux machine. While it might be possible to run from windows that scenario is not covered by this document.
+* The scripts are being run from a Linux machine. While it might be possible to run from Windows that scenario is not covered by this document.
 * The target AWS account has the desired VPC, subnet, Gateway, Security Group and KeyPair setup.
-
-## Scenario 1: Automated AWS deployment
 
 ### Creating a Windows AWS Instance
 
-> **Note:** This script assumes you have create an AWS Image by following the steps in [section 3](#3-Windows SQL-Server-Installation) which you pass it using **--ami <Image_ID>** 
+> **Note:** This script assumes you have create an AWS Image by following the steps in [Windows SQL Server Installation](Windows SQL Server Installation) which you pass it using **--ami <Image_ID>** 
 
 ```
 # Clone script repository
@@ -186,7 +183,7 @@ curl https://packages.microsoft.com/keys/microsoft.asc | sudo apt-key add -
 curl https://packages.microsoft.com/config/ubuntu/16.04/prod.list | sudo tee /etc/apt/sources.list.d/msprod.list
 sudo apt-get update
 sudo apt-get install mssql-tools unixodbc-dev
-
+Model specific services for generating area peril and vulnerability keys for a particular set of exposures.
 echo 'export PATH="$PATH:/opt/mssql-tools/bin"' >> ~/.bash_profile
 echo 'export PATH="$PATH:/opt/mssql-tools/bin"' >> ~/.bashrc
 echo 'export PATH="$PATH:/opt/mssql-tools/bin"' | sudo tee --append /root/.bash_profile
@@ -268,7 +265,7 @@ python load_data.py --sql_server_ip=10.10.0.50\
 ```
 
 
-#### 4.4 Docker Configuration
+#### Docker Configuration
 
 #### Edit the Docker daemon port
 ShinyProxy needs to connect to the docker daemon to spin up the containers. By default ShinyProxy will do so on port 2375 of the docker host.
