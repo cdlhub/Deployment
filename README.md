@@ -1,18 +1,10 @@
 # Oasis Deployment Scripts
-<!--
-- [1 The Oasis environment](#1-The-Oasis-environment)
-- [2 Script Usage](#2-Script-Usage)
-- [3 Windows SQL Server Installation](#3-Windows SQL-Server-Installation)
-- [4 Linux Environment Setup](#4-Linux-Environment-Setup)
-- [Licence](#licence)
---> 
 
-## 1 The Oasis environment
+## Base case Oasis platform
 
-This guide will focus in on a *base case* deployment, which is the minimal set of docker containers required to run the example Oasis windstorm model [PiWind](https://github.com/OasisLMF/OasisPiWind). 
+This guide will describe a base case deployment of the Oais platform, which is the minimal set of docker containers required to run the example Oasis windstorm model [PiWind](https://github.com/OasisLMF/OasisPiWind). The physical set up of the environment is shown in the following figure:
 
 ![alt text](https://github.com/OasisLMF/deployment/raw/assets/fig_oasis_environment.png )
-
 
 **Windows Server** The flamingo_server docker image requires [Microsoft SQL server 2016](https://www.microsoft.com/en-gb/sql-server/sql-server-2016) for data storage and transformation. This is based on a standard AMI hosted on AWS with some additional drives for Network mounting a directory to a linux server.
 
@@ -28,26 +20,30 @@ All of the core component images are publicly available on Docker Hub:
 * [coreoasis/model_execution_worker](https://hub.docker.com/r/coreoasis/model_execution_worker) A container for running loss analysis using the Oasis Ktools framework.
 * [coreoasis/piwind_keys_server](https://hub.docker.com/r/coreoasis/piwind_keys_server) Data lookup service, specific to each model.
 
+The deployment guide will detail two scenarios:
+1) Automated AWS deployment: this is a scripted deployment of the Oasis platform in AWS. This is the most strightforward way to set up the Oasis platform.
+2) Manual deployment on AWS: this is the manual process for building and deploying an Oasis platform. Again, we use an AWS environment for illustration but the same steps can be used as a template for installing the Oasis platform on other environmemts. 
+
 <!--- ### 1.2 Optional Components -->
 
-## 2 Script Usage
+## Scripts Overview
 To create an AWS Oasis base environment you will need to run two scripts in the following order.
-* [deploy_SQL.py](https://github.com/OasisLMF/deployment/blob/master/deploy_SQL.py) creates a windows SQL server based on a preconfigured image.
-* [deploy_OASIS.py](https://github.com/OasisLMF/deployment/blob/master/deploy_OASIS.py) launches a stock linux AMI, then injects and runs an installation script.
+* [deploy_SQL.py](https://github.com/OasisLMF/deployment/blob/master/deploy_SQL.py) creates a Windows SQL server based on a preconfigured image.
+* [deploy_OASIS.py](https://github.com/OasisLMF/deployment/blob/master/deploy_OASIS.py) launches a stock Linux AMI, then injects and runs an installation script.
 
-### 2.1 Prerequisites
+### Prerequisites
 * The scripts are being run from a linux machine. While it might be possible to run from windows that scenario is not covered by this document.
 * The target AWS account has the desired VPC, subnet, Gateway, Security Group and KeyPair setup.
 
-### 2.2 Examples
+## Scenario 1: Automated AWS deployment
 
-#### Creating a Windows AWS Instance
+### Creating a Windows AWS Instance
 
 > **Note:** This script assumes you have create an AWS Image by following the steps in [section 3](#3-Windows SQL-Server-Installation) which you pass it using **--ami <Image_ID>** 
 
 ```
 # Clone script repository
-git clone https://github.com/OasisLMF/AWS.git
+git clone https://github.com/OasisLMF/Deployment.git
 
 # Install script dependencies  
 pip install -r requirements.txt
@@ -66,7 +62,7 @@ pip install -r requirements.txt
                 --ip            10.10.0.x \
 ```
 
-#### Creating an Ubuntu 16.04 AWS Instance
+### Creating an Ubuntu 16.04 AWS Instance
 
 > **Note:** Wait for the Windows server to fully initialize before running the MidTier script, which will create database tables and stored procedures. 
 
@@ -77,7 +73,7 @@ This script automates the steps from [Linux Envrioment]() Section of the local i
 * Configure and run Docker.
 ```
 # Clone script repository
-git clone https://github.com/OasisLMF/AWS.git
+git clone https://github.com/OasisLMF/Deployment.git
 
 # Install script dependencies  
 pip install -r requirements.txt
@@ -117,22 +113,23 @@ pip install -r requirements.txt
                   --dockerpassword      ******* \
 ```
 
-# Local Deployment Guide
+## Scenario 1: Manual deployment on AWS
 
-## 3 Windows SQL Server Installation
+### Windows SQL Server Installation
 
-### 3.1 Launch a Windows AWS instance
+#### Launch a Windows AWS instance
 
 From AWS create an instance based on the AMI: `Windows_Server-2012-R2_RTM-English-64Bit-SQL_2016_SP1_Web`, once its running:
 * Set the Admin Password
 * Connect via RDP 
 
-### 3.2 Install drivers
+#### Install drivers
 * Update Windows
 * Install [Microsoft Access Database Engine 2010 (x64)](https://www.microsoft.com/en-US/download/details.aspx?id=13255).
 * Update [SSMS](https://docs.microsoft.com/en-us/sql/ssms/download-sql-server-management-studio-ssms?view=sql-server-2017) to the latest version.
 
-### 3.2 Configuration
+### Configuration
+
 #### Create File Share
 * Create a directory for mounting to the Linux host which will run the Flamingo server docker image. We usually default to using `C:\flamingo_share`. 
 * Set this directory as a private network share and give full access to a new user flamingo
@@ -150,13 +147,13 @@ From AWS create an instance based on the AMI: `Windows_Server-2012-R2_RTM-Englis
 #### Save as AMI
 * Create an image from your instance (Actions menu), and note the AMI to use in the deploy_SQL.py script.
 
-
-## 4 Linux Environment Setup
+### Linux Environment Setup
 
 > **Prerequisite:** The windows SQL server running the Flamingo datastore  must be running and accessible.
 
 The following section will step though the deploy of an example oasis environment, see fig 1, and is equivalent to running [mid_system-init-ubuntu.sh](https://github.com/OasisLMF/deployment/blob/master/shell-scripts/mid_system-init-ubuntu.sh). 
-### 4.1 Install requirments
+
+#### Install requirments
 This subsection is **specific to Ubuntu 16.04**. In order to adapt the deployment to another distribution you will need to install the following:
 * [docker-ce](https://docs.docker.com/install/)
 * [cifs-utils](https://github.com/Distrotech/cifs-utils)
@@ -196,9 +193,9 @@ echo 'export PATH="$PATH:/opt/mssql-tools/bin"' | sudo tee --append /root/.bashr
 . ~/.bashrc
 ```
 
-### 4.2 Install Flamingo
+#### Install Flamingo
 
-#### Setup the Shared files
+##### Setup the Shared files
 we need to mount the shared directory from the windows instance which we set to `C:\flamingo_share`
 using the flamingo share account. `username=<FLAMINGO_SHARE_USER>` and `password=<FLAMINGO_SHARE_PASSWORD>`
 ```
@@ -215,19 +212,19 @@ echo "//<SQL_IP>/flamingo_share ${HOME}/flamingo_share cifs uid=1000,gid=1000,rw
 sudo mount -a
 ```
 
-#### Clone the Flamingo UI repository
+##### Clone the Flamingo UI repository
 ```
 cd ~/
 git clone https://github.com/OasisLMF/Flamingo.git
 ```
 
-#### Copy the Flamingo share directory structure
+##### Copy the Flamingo share directory structure
 ```
 # copy necessary Oasis environment files from git directories to local directories
 cp -rf ~/Flamingo/Files ~/flamingo_share/
 ```
 
-#### create the Flamingo database
+##### create the Flamingo database
 The git repository we just cloned has a database setup script to initialize the SQL server
 ```
 cd ~/Flamingo/SQLFiles
@@ -240,22 +237,22 @@ python create_db.py --sql_server_ip=10.10.0.50\
                         --version=0.392.1
 ```
 
-### 4.3 Installing a model
+#### Installing a model
 The example base oasis environment only adds PiWind, but the steps used to install it also apply to other models.
 
-#### Clone the model Repository 
+##### Clone the model Repository 
 ```
 cd ~/
 git clone https://github.com/OasisLMF/OasisPiWind.git 
 ```
 
-#### Copy model files to the Flamingo file share
+##### Copy model files to the Flamingo file share
 ```
 cp -rf ~/OasisPiWind/flamingo/PiWind/Files/TransformationFiles/*.* ~/flamingo_share/Files/TransformationFiles/
 cp -rf ~/OasisPiWind/flamingo/PiWind/Files/ValidationFiles/*.* ~/flamingo_share/Files/ValidationFiles/
 ```
 
-#### Loading PiWind to the Flamingo Database
+##### Loading PiWind to the Flamingo Database
 ```
 cd ~/OasisPiWind/flamingo/PiWind/SQLFiles/
 
@@ -269,7 +266,7 @@ python load_data.py --sql_server_ip=10.10.0.50\
 ```
 
 
-### 4.4 Docker Configuration
+#### 4.4 Docker Configuration
 
 #### Edit the Docker daemon port
 ShinyProxy needs to connect to the docker daemon to spin up the containers. By default ShinyProxy will do so on port 2375 of the docker host.
@@ -284,14 +281,14 @@ systemctl daemon-reload
 systemctl start docker
 ```
 
-#### Install Docker-Compose 
+##### Install Docker-Compose 
 ```
 # install Docker-Compose
 curl -L https://github.com/docker/compose/releases/download/1.14.0/docker-compose-`uname -s`-`uname -m` > /usr/local/bin/docker-compose
 chmod +x /usr/local/bin/docker-compose
 ```
 
-#### Run the Oasis Containers
+##### Run the Oasis Containers
 
 Copy the example Yml files from this repository and edit the file [env.config](https://github.com/OasisLMF/deployment/blob/master/compose/env.config)
 so its values match the various usernames, passwords, dirs, ports and IP addresses specific to an installation. Then run the helper script `oasis-service` to spin up the Oasis containers.
