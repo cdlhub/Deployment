@@ -1,3 +1,5 @@
+#!/bin/sh
+
 exec &> >(tee -a install-piwind.log)
 
 echo "[`date`] Install PiWind"
@@ -13,9 +15,11 @@ cp -rf /home/ubuntu/OasisPiWind/model_data/PiWind/*.* /home/ubuntu/model_data/
 echo "> load model data into the Oasis environment SQL database"
 cd /home/ubuntu/OasisPiWind/flamingo/PiWind/SQLFiles
 chmod 711 load_data.py
+PATH="$PATH":/opt/mssql-tools/bin
 ./load_data.py -s <SQL_IP> -n <SQL_ENV_NAME> -l <SQL_ENV_PASS> -a <KEYS_SERVICE_IP> -A <KEYS_SERVICE_PORT> -o <OASIS_API_IP> -O <OASIS_API_PORT>
 
 echo "> configure worker files"
+cd
 sed -i 's/__oasis_release_tag__/<OASIS_RELEASE_TAG>/g' oasisworker.yml
 sed -i 's/__ip_address__/<IP_ADDRESS>/g' oasisworker.yml
 sed -i 's/__model_supplier__/<MODEL_SUPPLIER>/g' oasisworker.yml
