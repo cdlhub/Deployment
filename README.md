@@ -38,7 +38,7 @@ To create an AWS Oasis base environment you will need to run two scripts in the 
 
 ### Creating a Windows AWS Instance
 
-> **Note:** This script assumes you have create an AWS Image by following the steps in [Windows SQL Server Installation](#Windows_SQL_Server_Installation) which you pass it using **--ami <Image_ID>** 
+> **Note:** This script assumes you have created an AWS image and volume by following the steps in [Windows SQL Server Installation](#Windows_SQL_Server_Installation) which you pass it using **--ami <IMAGE_ID> --snap= <SNAPSHOT_ID>**  
 
 ```
 # Clone script repository
@@ -146,7 +146,7 @@ From AWS create an instance based on the AMI: `Windows_Server-2012-R2_RTM-Englis
 * From Services program, restart SQL Server (MSSQLSERVER) service.
 
 #### Save as AMI
-* Create an image from your instance (Actions menu), and note the AMI to use in the deploy_SQL.py script.
+* Create an image from your instance and a snapshot of the attached volume. Note the AMI ID and snapshot IS to use in the deploy_SQL.py script. 
 
 ### <a name="Linux_Environment_Setup"></a>Linux Environment Setup
 
