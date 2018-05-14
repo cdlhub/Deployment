@@ -6,7 +6,7 @@ Automation scipts for deploying a base case Oasis platform.
 
 ## Base case Oasis platform
 
-This guide will describe a base case deployment of the Oais platform, which is the minimal set of docker containers required to run the example Oasis windstorm model [PiWind](https://github.com/OasisLMF/OasisPiWind). The physical set up of the environment is shown in the following figure:
+This guide will describe a base case deployment of the Oais platform, which is the minimal set required to run the example Oasis windstorm model [PiWind](https://github.com/OasisLMF/OasisPiWind). The physical set up of the environment is shown in the following figure:
 
 ![alt text](https://github.com/OasisLMF/deployment/raw/assets/fig_oasis_environment.png )
 
