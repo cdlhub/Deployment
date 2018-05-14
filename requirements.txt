@@ -19,5 +19,6 @@ pylint==1.8.4
 PyNaCl==1.2.1
 python-dateutil==2.6.1
 s3transfer==0.1.12
+scp==0.11.0
 six==1.11.0
 wrapt==1.10.11
