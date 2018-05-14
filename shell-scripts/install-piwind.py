@@ -10,7 +10,6 @@ import argparse
 import configparser
 import os
 import paramiko
-# import scp
 
 # Read command line options
 
