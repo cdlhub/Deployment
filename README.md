@@ -61,9 +61,11 @@ pip install -r requirements.txt
                 --ip            10.10.0.x \
 ```
 
-### Creating an Ubuntu 16.04 AWS Instance
+### Creating The Linux Instance
 
 > **Note:** Wait for the Windows server to fully initialize before running the Oasis deployment script, which will create database tables and stored procedures. 
+
+> **Note:** these steps are for an Ubuntu 16.04. The process may be adapted for other Linux distributions.
 
 This script automates the steps from [Linux Envrioment Setup](#Linux_Environment_Setup) section:
 * Install docker-ce and other dependencies.
@@ -123,7 +125,7 @@ From AWS create an instance based on the AMI: `Windows_Server-2012-R2_RTM-Englis
 * Connect via RDP 
 
 #### Install drivers
-* Update Windows
+* Update Windows.
 * Install [Microsoft Access Database Engine 2010 (x64)](https://www.microsoft.com/en-US/download/details.aspx?id=13255).
 * Update [SSMS](https://docs.microsoft.com/en-us/sql/ssms/download-sql-server-management-studio-ssms?view=sql-server-2017) to the latest version.
 
@@ -131,8 +133,7 @@ From AWS create an instance based on the AMI: `Windows_Server-2012-R2_RTM-Englis
 
 #### Create File Share
 * Create a directory for mounting to the Linux host which will run the Flamingo server docker image. We usually default to using `C:\flamingo_share`. 
-* Set this directory as a private network share and give full access to a new user flamingo
- with `username=<FLAMINGO_SHARE_USER>` and `password=<FLAMINGO_SHARE_PASSWORD>`
+* Set this directory as a private network share and give full access to a new user flamingo with `username=<FLAMINGO_SHARE_USER>` and `password=<FLAMINGO_SHARE_PASSWORD>`.
 
 #### Allow sa remote connection to SQL Server
 * Use SQL Server Management Studio to connect to your database server using Windows Authentication with Administrator user.
@@ -150,7 +151,7 @@ From AWS create an instance based on the AMI: `Windows_Server-2012-R2_RTM-Englis
 
 > **Prerequisite:** The windows SQL server running the Flamingo datastore  must be running and accessible.
 
-The following section will step though the deploy of an example oasis environment, see fig 1, and is equivalent to running [mid_system-init-ubuntu.sh](https://github.com/OasisLMF/deployment/blob/master/shell-scripts/mid_system-init-ubuntu.sh). 
+The following section will step though the deployment of the base-case Oasis environment and is equivalent to running [mid_system-init-ubuntu.sh](https://github.com/OasisLMF/deployment/blob/master/shell-scripts/mid_system-init-ubuntu.sh). 
 
 #### Install requirments
 This subsection is **specific to Ubuntu 16.04**. In order to adapt the deployment to another distribution you will need to install the following:
@@ -196,7 +197,7 @@ echo 'export PATH="$PATH:/opt/mssql-tools/bin"' | sudo tee --append /root/.bashr
 
 ##### Setup the Shared files
 we need to mount the shared directory from the windows instance which we set to `C:\flamingo_share`
-using the flamingo share account. `username=<FLAMINGO_SHARE_USER>` and `password=<FLAMINGO_SHARE_PASSWORD>`
+using the flamingo share account. `username=<FLAMINGO_SHARE_USER>` and `password=<FLAMINGO_SHARE_PASSWORD>`.
 ```
 # Create Fileshares mount points
 mkdir ~/download ~/upload ~/model_data ~/flamingo_share
@@ -239,7 +240,7 @@ python create_db.py --sql_server_ip=10.10.0.50\
 #### Installing a model
 The example base oasis environment only adds PiWind, but the steps used to install it also apply to other models.
 
-##### Clone the model Repository 
+##### Clone the model repository
 ```
 cd ~/
 git clone https://github.com/OasisLMF/OasisPiWind.git 
@@ -251,7 +252,7 @@ cp -rf ~/OasisPiWind/flamingo/PiWind/Files/TransformationFiles/*.* ~/flamingo_sh
 cp -rf ~/OasisPiWind/flamingo/PiWind/Files/ValidationFiles/*.* ~/flamingo_share/Files/ValidationFiles/
 ```
 
-##### Loading PiWind to the Flamingo Database
+##### Loading PiWind to the Flamingo database
 ```
 cd ~/OasisPiWind/flamingo/PiWind/SQLFiles/
 
@@ -287,7 +288,7 @@ curl -L https://github.com/docker/compose/releases/download/1.14.0/docker-compos
 chmod +x /usr/local/bin/docker-compose
 ```
 
-##### Run the Oasis Containers
+##### Run the Oasis containers
 
 Copy the example Yml files from this repository and edit the file [env.config](https://github.com/OasisLMF/deployment/blob/master/compose/env.config)
 so its values match the various usernames, passwords, dirs, ports and IP addresses specific to an installation. Then run the helper script `oasis-service` to spin up the Oasis containers.
