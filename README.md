@@ -130,8 +130,6 @@ From AWS create an instance based on the AMI: `Windows_Server-2012-R2_RTM-Englis
 * Install [Microsoft Access Database Engine 2010 (x64)](https://www.microsoft.com/en-US/download/details.aspx?id=13255).
 * Update [SSMS](https://docs.microsoft.com/en-us/sql/ssms/download-sql-server-management-studio-ssms?view=sql-server-2017) to the latest version.
 
-### Configuration
-
 #### Create File Share
 * Create a directory for mounting to the Linux host which will run the Flamingo server docker image. We usually default to using `C:\flamingo_share`. 
 * Set this directory as a private network share and give full access to a new user flamingo with `username=<FLAMINGO_SHARE_USER>` and `password=<FLAMINGO_SHARE_PASSWORD>`.
