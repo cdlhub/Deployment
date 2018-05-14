@@ -51,11 +51,12 @@ script = script.replace("<SQL_ENV_NAME>", config['Database']['name'])
 script = script.replace("<SQL_ENV_PASS>", config['Database']['password'])
 
 script = script.replace("<IP_ADDRESS>", config['FlamingoServer']['ip'])
-script = script.replace("<OASIS_API_IP>", config['Oasis']['api_ip'])
+
+script = script.replace("<OASIS_API_IP>", config['FlamingoServer']['ip'])
 script = script.replace("<OASIS_API_PORT>", config['Oasis']['api_port'])
 script = script.replace("<OASIS_RELEASE_TAG>", config['Oasis']['oasis_release_tag'])
 
-script = script.replace("<KEYS_SERVICE_IP>", config['PiWind']['keys_service_ip'])
+script = script.replace("<KEYS_SERVICE_IP>", config['FlamingoServer']['ip'])
 script = script.replace("<KEYS_SERVICE_PORT>", config['PiWind']['keys_service_port'])
 script = script.replace("<MODEL_SUPPLIER>", config['PiWind']['model_supplier'])
 script = script.replace("<MODEL_VERSION>", config['PiWind']['model_version'])
