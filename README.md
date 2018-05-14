@@ -130,7 +130,7 @@ From AWS create an instance based on the AMI: `Windows_Server-2012-R2_RTM-Englis
 * Install [Microsoft Access Database Engine 2010 (x64)](https://www.microsoft.com/en-US/download/details.aspx?id=13255).
 * Update [SSMS](https://docs.microsoft.com/en-us/sql/ssms/download-sql-server-management-studio-ssms?view=sql-server-2017) to the latest version.
 
-#### Create File Share
+#### Create the file share
 * Create a directory for mounting to the Linux host which will run the Flamingo server docker image. We usually default to using `C:\flamingo_share`. 
 * Set this directory as a private network share and give full access to a new user flamingo with `username=<FLAMINGO_SHARE_USER>` and `password=<FLAMINGO_SHARE_PASSWORD>`.
 
@@ -143,7 +143,7 @@ From AWS create an instance based on the AMI: `Windows_Server-2012-R2_RTM-Englis
 * Select the Security screen on the left, and set Server authentication to SQL Server and Windows Authentication mode.
 * From Services program, restart SQL Server (MSSQLSERVER) service.
 
-#### Save as AMI
+#### Save the AMI
 * Create an image from your instance and a snapshot of the attached volume. Note the AMI ID and snapshot IS to use in the deploy_SQL.py script. 
 
 ### <a name="Linux_Environment_Setup"></a>Linux Environment Setup
@@ -236,8 +236,9 @@ python create_db.py --sql_server_ip=10.10.0.50\
                         --version=0.392.1
 ```
 
-#### Installing a model
-The example base oasis environment only adds PiWind, but the steps used to install it also apply to other models.
+#### Installing the PiWind model
+
+The example base case Oasis environment only adds PiWind, but the steps used to install it also apply to other models.
 
 ##### Clone the model repository
 ```
@@ -264,8 +265,7 @@ python load_data.py --sql_server_ip=10.10.0.50\
                     --oasis_api_port=9003
 ```
 
-
-#### Docker Configuration
+#### Docker configuration
 
 #### Edit the Docker daemon port
 ShinyProxy needs to connect to the docker daemon to spin up the containers. By default ShinyProxy will do so on port 2375 of the docker host.
@@ -288,6 +288,22 @@ chmod +x /usr/local/bin/docker-compose
 ```
 
 ##### Run the Oasis containers
+
+Get the required docker-compose files from GitHub:
+
+```
+cd /home/ubuntu
+sudo -u ubuntu git clone https://<GIT_USER>:<GIT_PASSWORD>@github.com/OasisLMF/Flamingo.git
+sudo -u ubuntu git clone https://<GIT_USER>:<GIT_PASSWORD>@github.com/OasisLMF/OasisApi.git
+sudo -u ubuntu git clone https://<GIT_USER>:<GIT_PASSWORD>@github.com/OasisLMF/OasisPiWind.git
+
+echo # copy generic yml files from git directories to local directories
+
+cp /home/ubuntu/Flamingo/build/flamingo.yml /home/ubuntu/
+cp /home/ubuntu/OasisApi/build/oasisapi.yml /home/ubuntu/
+cp /home/ubuntu/OasisApi/build/oasisworker.yml /home/ubuntu/
+cp /home/ubuntu/OasisPiWind/build/oasispiwindkeysserver.yml /home/ubuntu/
+```
 
 To start all of the required containers, run the following commands:
 
