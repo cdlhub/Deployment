@@ -37,6 +37,7 @@ echo # modify Shiny Proxy startup
 
 sed -i 's/ExecStart=\/usr\/bin\/dockerd/ExecStart=\/usr\/bin\/dockerd -H unix:\/\/\/var\/run\/docker.sock -D -H tcp:\/\/0.0.0.0:2375/g' /lib/systemd/system/docker.service
 systemctl daemon-reload
+systemctl stop docker
 systemctl start docker
 
 echo # Docker post install tasks
