@@ -113,7 +113,7 @@ pip install -r requirements.txt
                   --dockerpassword      ******* \
 ```
 
-## Scenario 1: Manual deployment on AWS
+## Scenario 2: Manual deployment on AWS
 
 ### Windows SQL Server Installation
 
