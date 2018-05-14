@@ -32,12 +32,12 @@ All of the core component images are publicly available on Docker Hub:
 
 ## 2 Script Usage
 To create an AWS Oasis base environment you will need to run two scripts in the following order.
-* [deploy_SQL.py](https://github.com/OasisLMF/deployment/blob/master/deploy_SQL.py) creates a windows SQL server based on a preconfigured AMI.
-* [deploy_OASIS.py](https://github.com/OasisLMF/deployment/blob/master/deploy_OASIS.py) launches a stock linux AMI, then injects and runs an installation.
+* [deploy_SQL.py](https://github.com/OasisLMF/deployment/blob/master/deploy_SQL.py) creates a windows SQL server based on a preconfigured image.
+* [deploy_OASIS.py](https://github.com/OasisLMF/deployment/blob/master/deploy_OASIS.py) launches a stock linux AMI, then injects and runs an installation script.
 
 ### 2.1 Prerequisites
 * The scripts are being run from a linux machine. While it might be possible to run from windows that scenario is not covered by this document.
-* The target AWS account has the desired VPC, subnet, Gateway, Security Group and KeyPair setup. If not, then see the `Network infrastructure` section of AWS deployment scripts readme.
+* The target AWS account has the desired VPC, subnet, Gateway, Security Group and KeyPair setup.
 
 ### 2.2 Examples
 
