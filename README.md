@@ -1,7 +1,5 @@
 <img src="https://oasislmf.org/packages/oasis_theme_package/themes/oasis_theme/assets/src/oasis-lmf-colour.png" alt="Oasis LMF logo" width="250"/>
 
-# Deployment
-
 Automation scipts for deploying a base case Oasis platform, which is the minimal set required to run the example Oasis windstorm model [PiWind](https://github.com/OasisLMF/OasisPiWind). 
 
 The deployment guide will detail two scenarios:
