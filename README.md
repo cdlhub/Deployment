@@ -144,7 +144,7 @@ From AWS create an instance based on the AMI: `Windows_Server-2012-R2_RTM-Englis
 * From Services program, restart SQL Server (MSSQLSERVER) service.
 
 #### Save the AMI
-* Create an image from your instance and a snapshot of the attached volume. Note the AMI ID and snapshot IS to use in the deploy_SQL.py script. 
+* Create an image from your instance and a snapshot of the attached volume. Note the AMI ID and snapshot ID to use in the deploy_SQL.py script. 
 
 ### <a name="Linux_Environment_Setup"></a>Linux Environment Setup
 
