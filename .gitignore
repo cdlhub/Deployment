@@ -108,3 +108,4 @@ ENV/
 
 # Flamingo configuration file
 config.ini
+shell-scripts/install-piwind.sh
