@@ -291,21 +291,13 @@ chmod +x /usr/local/bin/docker-compose
 
 ##### Run the Oasis containers
 
-Copy the example Yml files from this repository and edit the file [env.config](https://github.com/OasisLMF/deployment/blob/master/compose/env.config)
-so its values match the various usernames, passwords, dirs, ports and IP addresses specific to an installation. Then run the helper script `oasis-service` to spin up the Oasis containers.
-```
-git clone https://github.com/OasisLMF/deployment.git
-cp -r ./deployment/compose ~/
+To start all of the required containers, run the following commands:
 
-# --  Edit the Shell Variables -- #
-
-#run the oasis containers 
-~/compose/oasis-service up 
 ```
-
-Alternatively, you can edit the yml files directly and run docker compose.
-```
-docker-compose -f api.yml -f flamingo.yml -f PiWind_model.yml up -d 
+docker-compose -f oasispiwindkeysserver.yml up -d
+docker-compose -f oasisapi.yml up -d
+docker-compose -f oasisworker.yml up -d
+docker-compose -f flamingo.yml up -d
 ```
 
 ## License
