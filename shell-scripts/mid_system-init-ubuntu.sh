@@ -36,7 +36,7 @@ echo ###########################################################################
 echo # modify Shiny Proxy startup
 
 REPLACE='ExecStart=/usr/bin/dockerd -H fd:// -D -H tcp://0.0.0.0:2375'
-sudo sed -i "/ExecStart=/c$REPLACE" /lib/systemd/system/docker.service
+sed -i "/ExecStart=/c$REPLACE" /lib/systemd/system/docker.service
 systemctl daemon-reload
 systemctl stop docker
 systemctl start docker
