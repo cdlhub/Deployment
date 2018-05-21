@@ -20,7 +20,7 @@ The physical set up of the base case environment is shown in the following figur
 
 All of the core component images are publicly available on DockerHub:
 
-* [coreoasis/shiny_proxy](https://hub.docker.com/r/coreoasis/shiny_proxy) Appliucation server for Oasis UI, a browser based application for managing exposure data and operating modelling workflows.
+* [coreoasis/shiny_proxy](https://hub.docker.com/r/coreoasis/shiny_proxy) Application server for Oasis UI, a browser based application for managing exposure data and operating modelling workflows.
 * [coreoasis/flamingo_server](https://hub.docker.com/r/coreoasis/flamingo_server) Services for interacting with exposure and output data.
 * [coreoasis/oasis_api_server](https://hub.docker.com/r/coreoasis/oasis_api_server) Services for uploading Oasis files, running analyses and retrieving outputs.
 * [coreoasis/model_execution_worker](https://hub.docker.com/r/coreoasis/model_execution_worker) Worker for running loss analysis using the Oasis Ktools framework.
