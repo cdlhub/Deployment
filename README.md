@@ -303,6 +303,25 @@ cp /home/ubuntu/OasisApi/build/oasisworker.yml /home/ubuntu/
 cp /home/ubuntu/OasisPiWind/build/oasispiwindkeysserver.yml /home/ubuntu/
 ```
 
+Replace the placeholder tags in the generic yml files with values specific to your installation. 
+
+```
+sed -i 's/__oasis_release_tag__/<OASIS_RELEASE_TAG>/g' oasisapi.yml
+
+sed -i 's/__oasis_release_tag__/<OASIS_RELEASE_TAG>/g' oasisworker.yml
+sed -i 's/__ip_address__/<IP_ADDRESS>/g' oasisworker.yml
+sed -i 's/__model_supplier__/<MODEL_SUPPLIER>/g' oasisworker.yml
+sed -i 's/__model_version__/<MODEL_VERSION>/g' oasisworker.yml
+
+sed -i 's/__flamingo_release_tag__/<FLAMINGO_RELEASE_TAG>/g' flamingo.yml
+sed -i 's/__sql_env_name__/<SQL_ENV_NAME>/g' flamingo.yml
+sed -i 's/__sql_ip__/<SQL_IP>/g' flamingo.yml
+sed -i 's/__sql_port__/<SQL_PORT>/g' flamingo.yml
+sed -i 's/__sql_env_pass__/<SQL_ENV_PASS>/g' flamingo.yml
+sed -i 's/__ip_address__/<IP_ADDRESS>/g' flamingo.yml
+```
+
+
 To start all of the required containers, run the following commands:
 
 ```
