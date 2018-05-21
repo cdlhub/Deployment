@@ -274,10 +274,8 @@ See [Shiny Proxy - Getting started](https://www.shinyproxy.io/getting-started/#d
 # Tweak the Docker daemon port
 REPLACE='ExecStart=/usr/bin/dockerd -H fd:// -D -H tcp://0.0.0.0:2375'
 sudo sed -i "/ExecStart=/c$REPLACE" /lib/systemd/system/docker.service
-
-/lib/systemd/system/docker.service
-systemctl daemon-reload
-systemctl start docker
+sudo systemctl daemon-reload
+sudo systemctl start docker
 ```
 
 ##### Install Docker-Compose 
