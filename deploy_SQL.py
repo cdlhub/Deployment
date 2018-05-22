@@ -10,74 +10,58 @@ you are running it from. Most options depend on your AWS setup.
 
 import argparse
 import boto3
+import configparser
 
-parser = argparse.ArgumentParser(description='Choose Instance Options.')
+# Read command line arguments
 
+parser = argparse.ArgumentParser(description='Provision Flamingo back-end SQL Server from AMI.')
 
-# AWS options
-
-# AWS region where the instance  is created
-parser.add_argument('--region', action='store', dest='region', required=True)
-# The name of AWS key pair that will be used to access the instance
-parser.add_argument('--key', action='store', dest='key_name', required=True)
-# AWS security group that the instance will belong to
-parser.add_argument('--securitygroup', action='store', dest='security_group', required=True)
-# AWS instance type
-parser.add_argument('--type', action='store', dest='instance_type', required=True)
-# AWS instance volume size
-parser.add_argument('--size', action='store', dest='volume_size', default=50, type=int)
-# AWS subnet that the instance will belong to
-parser.add_argument('--subnet', action='store', dest='subnet', required=True)
-# The primary AWS instance IP address.
-# You must specify a value from the IPv4 address range of the subnet.
-parser.add_argument('--ip', action='store', dest='ip_address', required=True)
-# AWS instance name assigned to tag 'Name'.
-parser.add_argument('--name', action='store', dest='instance_name', required=True)
-# Parameter to specify AWS profile configuration credentials
-parser.add_argument('--session', action='store', dest='session_profile', default='default', required=False)
-# Flag to perform a dry run
-parser.add_argument('--dryrun', action='store_true', dest='dry_run', default=False)
-# SQL Server private AMI ID
-parser.add_argument('--ami', action='store', dest='ami_id', required=True)
-# SQL Server volume snapshot ID
-parser.add_argument('--snap', action='store', dest='snapshot_id', required=True)
+parser.add_argument('--config', action='store', dest='config', default='config.ini', help='set INI configuration file name (default: config.ini)')
+parser.add_argument('--session', action='store', dest='session_profile', default='default', required=False, help='AWS profile to get credentials')
+parser.add_argument('--key', action='store', dest='key_name', required=True, help='AWS access key file name to access the instace')
+parser.add_argument('--dryrun', action='store_true', dest='dry_run', default=False, help='flag to perform a dry run')
 
 args = parser.parse_args()
+
+# Read configuration file
+
+config = configparser.ConfigParser()
+config.read(args.config)
 
 # AWS instance specific settings
 
 session = boto3.Session(profile_name=args.session_profile)
-ec2 = session.resource('ec2', region_name=args.region)
+ec2 = session.resource('ec2', region_name=config['Common']['region'])
 
 instance = ec2.create_instances(
     DryRun=args.dry_run,
-    ImageId=args.ami_id,
+    ImageId=config['SqlServer']['ami'],
     MinCount=1,
     MaxCount=1,
     KeyName=args.key_name,
     SecurityGroupIds=[
-        args.security_group,
+        config['SqlServer']['security_group'],
     ],
-    InstanceType=args.instance_type,
+    InstanceType=config['SqlServer']['instance_type'],
     BlockDeviceMappings=[
         {
             'DeviceName': '/dev/sda1',
             'Ebs': {
-                'SnapshotId': args.snapshot_id,
-                'VolumeSize': args.volume_size,
-                'VolumeType': 'gp2'
+                'SnapshotId': config['SqlServer']['snapshot'],
+                'VolumeSize': int(config['SqlServer']['volume_size']),
+                'VolumeType': config['SqlServer']['volume_type']
             },
         },
     ],
-    SubnetId=args.subnet,
-    PrivateIpAddress=args.ip_address,
+    SubnetId=config['SqlServer']['subnet'],
+    PrivateIpAddress=config['SqlServer']['ip'],
     TagSpecifications=[
         {
             'ResourceType': 'instance',
             'Tags': [
                 {
                     'Key': 'Name',
-                    'Value': args.instance_name
+                    'Value': config['SqlServer']['name']
                 },
             ]
         },
