@@ -24,8 +24,8 @@ services:
     # Required to allow GDB
     privileged: true
     environment:
-     - MODEL_SUPPLIER_ID=ImpactForecasting
-     - MODEL_VERSION_ID=IREQ
+     - MODEL_SUPPLIER_ID=OasisLMF
+     - MODEL_VERSION_ID=PiWind
      - LOCK_FILE = '/tmp/tmp_ktools_lock_file'
      - DO_CLEAR_WORKING = True
      - KTOOLS_BATCH_COUNT=-1
