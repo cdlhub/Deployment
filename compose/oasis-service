@@ -5,9 +5,9 @@ cd $SCRIPT_DIR
 load_config(){
     if [ -z "$1" ]; then
         CONF='env.config'
-    else 
+    else
         CONF=$1
-    fi  
+    fi
     source $CONF
     echo " --- Docker Variables ---"
     env | grep 'UI_'
@@ -20,20 +20,11 @@ load_config(){
 
 print_help(){
    cat <<EOF
-A wrapper script for loading model settings `env.config` which sets 
+A wrapper script for loading model settings `env.config` which sets
 shell variables to start the Oasis flamingo enviroment
-
-Usage:
-  oasis-service [ up | down | logs ] [config]
-
-print_help(){
-   cat <<EOF
-A wrapper script for loading model settings `env.config` which sets 
-shell variables to start the Oasis flamingo enviroment
-
 Usage:
   oasis-service [ up | down | logs ]
-    
+
 EOF
     exit 1
 }
@@ -42,15 +33,58 @@ if [ "$1" == "up" ]; then
     load_config
     docker pull coreoasis/flamingo_shiny:$RELEASE_TAG
     echo 'Starting Oasis'
-    docker-compose $COMPOSE_FILES up -d
+    docker-compose $COMPOSE_FILES up -d "${@:2}"
 elif [ "$1" == "down" ]; then
     load_config
     echo 'Stopping Oasis'
-    docker-compose $COMPOSE_FILES down -v
+    docker-compose $COMPOSE_FILES down -v "${@:2}"
+    docker ps -a | grep shiny | grep 2000 | awk {'print $1'} | xargs docker rm -f
 elif [ "$1" == "logs" ]; then
     load_config
     echo 'Following Oasis logs'
-    docker-compose $COMPOSE_FILES logs --tail=all
-else 
+    docker-compose $COMPOSE_FILES logs --tail=all "${@:2}"
+else
     print_help
-fi     
+fi
+
+
+
+
+# Note: need to add better arg handling for `[config]`
+#
+# A wrapper script for loading model settings `env.config` which sets
+# shell variables to start the Oasis flamingo enviroment
+# Usage:
+#   oasis-service [ up | down | logs ] [config]
+# print_help(){
+#    cat <<EOF
+
+# Docker Helper functions  
+#dcd(){
+#    # Jump into a docker container
+#    docker exec -it $1 bash
+#}
+#dls(){
+#    # list docker process
+#    docker ps
+#}
+#di(){
+#    # list docker imgs
+#    docker images
+#
+#    #Add flag to grep and delete
+#}
+#dexec(){
+#    # run and bash into image
+#    docker run --entrypoint /bin/bash -i -t $1
+#}
+#drm(){
+#    # stop and rm all containers
+#    image_list=$@
+#    if [ ! -n "$image_list" ]; then
+#        image_list=$(docker ps -aq)
+#    fi
+#    echo $image_list
+#    docker stop $image_list
+#}
+
