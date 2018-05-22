@@ -13,7 +13,7 @@ services:
     restart: always
     container_name: piwind_worker
     volumes:
-     - ${MODEL_DATA_PATH}:/var/oasis/model_data/OasisLMF/PiWind
+     - ${HOME}/OasisPiWind/model_data/PiWind/:/var/oasis/model_data/OasisLMF/PiWind
      - ${WORKER_UPLOAD_PATH}:/var/www/oasis/upload:rw
      - ${WORKER_DOWNLOAD_PATH}:/var/www/oasis/download:rw
      - /tmp:/tmp
