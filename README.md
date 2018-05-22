@@ -205,7 +205,7 @@ echo "username=<FLAMINGO_SHARE_USER>" > ~/.flamingo_share_credentials
 echo "password=<FLAMINGO_SHARE_PASSWORD>" >> ~/.flamingo_share_credentials
 chmod 600 ~/.flamingo_share_credentials
 
-echo "//<SQL_IP>/flamingo_share ${HOME}/flamingo_share cifs uid=1000,gid=1000,rw,credentials=${HOME}/.flamingo_share_credentials,iocharset=utf8,dir_mode=0775,noperm,sec=ntlm 0 0" >> /etc/fstab
+echo "//<SQL_IP>/flamingo_share ${HOME}/flamingo_share cifs uid=1000,gid=1000,rw,credentials=${HOME}/.flamingo_share_credentials,iocharset=utf8,dir_mode=0775,noperm,sec=ntlm 0 0" | sudo tee --append /etc/fstab
 
 # Reload /etc/fstab
 sudo mount -a
