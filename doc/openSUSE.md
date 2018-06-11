@@ -1,6 +1,10 @@
 Install Guide - openSUSE Leap 42.3
 ==================================
 
+This guide is an alternative openSUSE guide for the section [Scenario 2: Manual deployment on AWS](https://github.com/OasisLMF/Deployment/tree/master#scenario-2-manual-deployment-on-aws) of the main readme.
+
+
+
 
 ## Update the OS 
 ```
@@ -9,7 +13,6 @@ sudo zypper update -y
 
 ## Install Docker CE
 > Note: On the AWS image tested docker CE was pre-installed, if this is not the case you should be able to install it from the package manager using the following
-
 
 ```
 sudo zypper install -y docker
@@ -44,7 +47,7 @@ sudo systemctl start docker
 sudo usermod -G docker -a <YOUR_USERNAME>
 (Logout and back in)
 ```
-Once the above has been run, make sure to logout of the current session so the group permission change is applied to your user account. 
+Once executed, make sure to logout and back in again. This is to ensure the `docker` group permission change has been applied to `YOUR_USERNAME`. 
 
 
 
@@ -106,7 +109,17 @@ cd && git clone https://github.com/OasisLMF/Deployment.git
 (env.conf    ← edit values to match your installation)
 ```
 
+Edit the file `~/Deployment/compose/env.conf` so that each  Environment variable matches your deployment.
 
+| Variable          | Desc  |
+|---------          |-------|
+| RELEASE_TAG       | Oasis Platform version |
+| IP_SQL            | IP address of SQL server |
+| IP_MID            | IP address of OpenSUSE server |
+| UI_DB_ENVIRONMENT | `suse` |
+| UI_DB_USERNAME    | `suse` | 
+| UI_DB_PASSWORD    | `suse` |
+| UI_DB_NAME        | `Flamingo_suse` |
 
 [**env.conf**](https://raw.githubusercontent.com/OasisLMF/Deployment/master/compose/env.config)
 ```
@@ -126,7 +139,7 @@ export UI_DB_USERNAME='myUser'  <-- EDIT
 export UI_DB_PASSWORD='myPass'  <-- EDIT
 export UI_DB_PORT=1433
 export UI_DB_NAME='DB'          <-- EDIT
-export UI_IMAGE_SERVER='coreoasis/flamingo_server:'$RELEASE_TAG
+exRELEASE_TAGport UI_IMAGE_SERVER='coreoasis/flamingo_server:'$RELEASE_TAG
 
 ## Oasis API Settings
 export API_RABBIT_PORT=5672
@@ -148,6 +161,4 @@ export COMPOSE_PROJECT_NAME=${IP_MID}'_'${RELEASE_TAG}
 
 
 ## Run docker servers 
-```
-./oasis-service up
-```
+Start the Oasis docker containers using the helper script `~/Deployment/compose/oasis-service up` this loads and runs the container `*.yml` files using the environment variables from `env.conf`. 
