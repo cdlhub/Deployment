@@ -113,9 +113,9 @@ Edit the file `~/Deployment/compose/env.conf` so that each  Environment variable
 
 | Variable          | Desc  |
 |---------          |-------|
-| RELEASE_TAG       | Oasis Platform version |
-| IP_SQL            | IP address of SQL server |
-| IP_MID            | IP address of OpenSUSE server |
+| RELEASE_TAG       | [Oasis Platform version](https://hub.docker.com/r/coreoasis/oasis_api_server/tags/) |
+| IP_SQL            | <IP_address_SQL_server> |
+| IP_MID            | <IP_address_OpenSUSE_server> |
 | UI_DB_ENVIRONMENT | `suse` |
 | UI_DB_USERNAME    | `suse` | 
 | UI_DB_PASSWORD    | `suse` |
