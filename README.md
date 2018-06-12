@@ -214,19 +214,19 @@ sudo mount -a
 ##### Clone the Flamingo UI repository
 ```
 cd ~/
-git clone https://github.com/OasisLMF/Flamingo.git
+git clone https://github.com/OasisLMF/OasisUI.git
 ```
 
 ##### Copy the Flamingo share directory structure
 ```
 # copy necessary Oasis environment files from git directories to local directories
-cp -rf ~/Flamingo/Files ~/flamingo_share/
+cp -rf ~/OasisUI/Files ~/flamingo_share/
 ```
 
 ##### create the Flamingo database
 The git repository we just cloned has a database setup script to initialize the SQL server
 ```
-cd ~/Flamingo/SQLFiles
+cd ~/OasisUI/SQLFiles
 python create_db.py --sql_server_ip=10.10.0.50\
                         --sa_password=Test1234\
                         --environment_name=piwind\
@@ -291,13 +291,13 @@ Get the required docker-compose files from GitHub:
 
 ```
 cd /home/ubuntu
-sudo -u ubuntu git clone https://<GIT_USER>:<GIT_PASSWORD>@github.com/OasisLMF/Flamingo.git
+sudo -u ubuntu git clone https://<GIT_USER>:<GIT_PASSWORD>@github.com/OasisLMF/OasisUI.git
 sudo -u ubuntu git clone https://<GIT_USER>:<GIT_PASSWORD>@github.com/OasisLMF/OasisApi.git
 sudo -u ubuntu git clone https://<GIT_USER>:<GIT_PASSWORD>@github.com/OasisLMF/OasisPiWind.git
 
 echo # copy generic yml files from git directories to local directories
 
-cp /home/ubuntu/Flamingo/build/flamingo.yml /home/ubuntu/
+cp /home/ubuntu/OasisUI/build/flamingo.yml /home/ubuntu/
 cp /home/ubuntu/OasisApi/build/oasisapi.yml /home/ubuntu/
 cp /home/ubuntu/OasisApi/build/oasisworker.yml /home/ubuntu/
 cp /home/ubuntu/OasisPiWind/build/oasispiwindkeysserver.yml /home/ubuntu/
