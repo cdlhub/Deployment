@@ -214,19 +214,19 @@ sudo mount -a
 ##### Clone the Flamingo UI repository
 ```
 cd ~/
-git clone https://github.com/OasisLMF/Flamingo.git
+git clone https://github.com/OasisLMF/OasisUI.git
 ```
 
 ##### Copy the Flamingo share directory structure
 ```
 # copy necessary Oasis environment files from git directories to local directories
-cp -rf ~/Flamingo/Files ~/flamingo_share/
+cp -rf ~/OasisUI/Files ~/flamingo_share/
 ```
 
 ##### create the Flamingo database
 The git repository we just cloned has a database setup script to initialize the SQL server
 ```
-cd ~/Flamingo/SQLFiles
+cd ~/OasisUI/SQLFiles
 python create_db.py --sql_server_ip=10.10.0.50\
                         --sa_password=Test1234\
                         --environment_name=piwind\
@@ -287,49 +287,63 @@ chmod +x /usr/local/bin/docker-compose
 
 ##### Run the Oasis containers
 
-Get the required docker-compose files from GitHub:
-
 ```
-cd /home/ubuntu
-sudo -u ubuntu git clone https://<GIT_USER>:<GIT_PASSWORD>@github.com/OasisLMF/Flamingo.git
-sudo -u ubuntu git clone https://<GIT_USER>:<GIT_PASSWORD>@github.com/OasisLMF/OasisApi.git
-sudo -u ubuntu git clone https://<GIT_USER>:<GIT_PASSWORD>@github.com/OasisLMF/OasisPiWind.git
+cd && git clone https://github.com/OasisLMF/Deployment.git
+ cd ~/Deployment/compose
 
-echo # copy generic yml files from git directories to local directories
-
-cp /home/ubuntu/Flamingo/build/flamingo.yml /home/ubuntu/
-cp /home/ubuntu/OasisApi/build/oasisapi.yml /home/ubuntu/
-cp /home/ubuntu/OasisApi/build/oasisworker.yml /home/ubuntu/
-cp /home/ubuntu/OasisPiWind/build/oasispiwindkeysserver.yml /home/ubuntu/
+(env.conf    ← edit values to match your installation)
 ```
 
-Replace the placeholder tags in the generic yml files with values specific to your installation. 
+Edit the file `~/Deployment/compose/env.conf` so that each  Environment variable matches your deployment.
 
+| Variable          | Desc                          |
+|-------------------|-------------------------------|
+| RELEASE_TAG       | [Oasis Platform version](https://hub.docker.com/r/coreoasis/oasis_api_server/tags/) |
+| IP_SQL            | <IP_address_SQL_server>       |
+| IP_MID            | <IP_address_OpenSUSE_server>  |
+| UI_DB_ENVIRONMENT | `piwind`                      |
+| UI_DB_USERNAME    | `piwind`                      |
+| UI_DB_PASSWORD    | `piwind`                      |
+| UI_DB_NAME        | `Flamingo_piwind`             |
+
+[**env.conf**](https://raw.githubusercontent.com/OasisLMF/Deployment/master/compose/env.config)
 ```
-sed -i 's/__oasis_release_tag__/<OASIS_RELEASE_TAG>/g' oasisapi.yml
+#!/bin/bash
 
-sed -i 's/__oasis_release_tag__/<OASIS_RELEASE_TAG>/g' oasisworker.yml
-sed -i 's/__ip_address__/<IP_ADDRESS>/g' oasisworker.yml
-sed -i 's/__model_supplier__/<MODEL_SUPPLIER>/g' oasisworker.yml
-sed -i 's/__model_version__/<MODEL_VERSION>/g' oasisworker.yml
+## Server and release
+export RELEASE_TAG='0.392.2'    <-- EDIT
+export IP_SQL='10.10.0.xx'      <-- EDIT
+export IP_MID='10.10.0.xx'      <-- EDIT
 
-sed -i 's/__flamingo_release_tag__/<FLAMINGO_RELEASE_TAG>/g' flamingo.yml
-sed -i 's/__sql_env_name__/<SQL_ENV_NAME>/g' flamingo.yml
-sed -i 's/__sql_ip__/<SQL_IP>/g' flamingo.yml
-sed -i 's/__sql_port__/<SQL_PORT>/g' flamingo.yml
-sed -i 's/__sql_env_pass__/<SQL_ENV_PASS>/g' flamingo.yml
-sed -i 's/__ip_address__/<IP_ADDRESS>/g' flamingo.yml
+## Flamingo Settings
+export UI_WEB_PORT='8080'
+export UI_FILESHARE='/home/ec2-user/flamingo_share/Files'
+export UI_DB_IP=$IP_SQL
+export UI_DB_ENVIRONMENT='new'  <-- EDIT
+export UI_DB_USERNAME='myUser'  <-- EDIT
+export UI_DB_PASSWORD='myPass'  <-- EDIT
+export UI_DB_PORT=1433
+export UI_DB_NAME='DB'          <-- EDIT
+exRELEASE_TAGport UI_IMAGE_SERVER='coreoasis/flamingo_server:'$RELEASE_TAG
+
+## Oasis API Settings
+export API_RABBIT_PORT=5672
+export API_MYSQL_PORT=3306
+export API_SERVER_PORT=8001
+export API_UPLOAD_PATH=$HOME'/upload'
+export API_DOWNLOAD_PATH=$HOME'/download'
+
+## Worker Settings
+export WORKER_UPLOAD_PATH=$HOME'/upload'
+export WORKER_DOWNLOAD_PATH=$HOME'/download'
+
+## Docker-compose Settings
+OASIS_BASE=" -f api.yml -f flamingo.yml"
+MODELS=" -f PiWind_model.yml"
+export COMPOSE_FILES=${OASIS_BASE}${MODELS}
+export COMPOSE_PROJECT_NAME=${IP_MID}'_'${RELEASE_TAG}
 ```
 
 
-To start all of the required containers, run the following commands:
-
-```
-docker-compose -f oasispiwindkeysserver.yml up -d
-docker-compose -f oasisapi.yml up -d
-docker-compose -f oasisworker.yml up -d
-docker-compose -f flamingo.yml up -d
-```
-
-## License
-The code in this project is licensed under BSD 3-clause license.
+## Run docker servers
+Start the Oasis docker containers using the helper script `~/Deployment/compose/oasis-service up` this loads and runs the container `*.yml` files using the environment variables from `env.conf`.
