@@ -52,20 +52,20 @@ mount -a
 
 yum install -y git
 cd /home/centos
-sudo -u centos git clone https://<GIT_USER>:<GIT_PASSWORD>@github.com/OasisLMF/Flamingo.git
+sudo -u centos git clone https://<GIT_USER>:<GIT_PASSWORD>@github.com/OasisLMF/OasisUI.git
 sudo -u centos git clone https://<GIT_USER>:<GIT_PASSWORD>@github.com/OasisLMF/OasisApi.git
 sudo -u centos git clone https://<GIT_USER>:<GIT_PASSWORD>@github.com/OasisLMF/OasisPiWind.git
 
 # copy necessary Oasis environment files from git directories to local directories
 
-cp -rf /home/centos/Flamingo/Files /home/centos/flamingo_share/
+cp -rf /home/centos/OasisUI/Files /home/centos/flamingo_share/
 cp -rf /home/centos/OasisPiWind/flamingo/PiWind/Files/TransformationFiles/*.* /home/centos/flamingo_share/Files/TransformationFiles/
 cp -rf /home/centos/OasisPiWind/flamingo/PiWind/Files/ValidationFiles/*.* /home/centos/flamingo_share/Files/ValidationFiles/
 cp -rf /home/centos/OasisPiWind/model_data/PiWind/*.* /home/centos/model_data/
 
 # copy generic yml files from git directories to local directories
 
-cp /home/centos/Flamingo/build/flamingo.yml /home/centos/
+cp /home/centos/OasisUI/build/flamingo.yml /home/centos/
 cp /home/centos/OasisApi/build/oasisapi.yml /home/centos/
 cp /home/centos/OasisApi/build/oasisworker.yml /home/centos/
 cp /home/centos/OasisPiWind/build/oasispiwindkeysserver.yml /home/centos/
@@ -81,7 +81,7 @@ export PATH=$PATH:/opt/mssql-tools/bin
 
 # create Oasis environment SQL databse on the SQL server
 
-cd /home/centos/Flamingo/SQLFiles
+cd /home/centos/OasisUI/SQLFiles
 chmod 711 aws_create_db.py
 ./create_db.py -s <SQL_IP> -p <SQL_SA_PASSWORD> -n <SQL_ENV_NAME> -l <SQL_ENV_PASS> -f <SQL_ENV_FILES_LOC> -F <SHINY_ENV_FILES_LOC> -v <ENV_VERSION>
 
