@@ -13,7 +13,7 @@ services:
     restart: always
     container_name: piwind_worker
     volumes:
-     - ${MODEL_DATA_PATH}:/var/oasis/model_data/OasisLMF/PiWind
+     - ${HOME}/OasisPiWind/model_data/PiWind/:/var/oasis/model_data/OasisLMF/PiWind
      - ${WORKER_UPLOAD_PATH}:/var/www/oasis/upload:rw
      - ${WORKER_DOWNLOAD_PATH}:/var/www/oasis/download:rw
      - /tmp:/tmp
@@ -24,8 +24,8 @@ services:
     # Required to allow GDB
     privileged: true
     environment:
-     - MODEL_SUPPLIER_ID=ImpactForecasting
-     - MODEL_VERSION_ID=IREQ
+     - MODEL_SUPPLIER_ID=OasisLMF
+     - MODEL_VERSION_ID=PiWind
      - LOCK_FILE = '/tmp/tmp_ktools_lock_file'
      - DO_CLEAR_WORKING = True
      - KTOOLS_BATCH_COUNT=-1

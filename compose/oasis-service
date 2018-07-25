@@ -23,7 +23,7 @@ print_help(){
 A wrapper script for loading model settings `env.config` which sets
 shell variables to start the Oasis flamingo enviroment
 Usage:
-  oasis-service [ up | down | logs ]
+  oasis-service [ up | down | restart | logs ]
 
 EOF
     exit 1
@@ -39,6 +39,12 @@ elif [ "$1" == "down" ]; then
     echo 'Stopping Oasis'
     docker-compose $COMPOSE_FILES down -v "${@:2}"
     docker ps -a | grep shiny | grep 2000 | awk {'print $1'} | xargs docker rm -f
+elif [ "$1" == "restart" ]; then
+    load_config
+    echo 'Restarting Oasis'
+    docker-compose $COMPOSE_FILES down -v "${@:2}"
+    docker ps -a | grep shiny | grep 2000 | awk {'print $1'} | xargs docker rm -f
+    docker-compose $COMPOSE_FILES up -d "${@:2}"    
 elif [ "$1" == "logs" ]; then
     load_config
     echo 'Following Oasis logs'

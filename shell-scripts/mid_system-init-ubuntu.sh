@@ -78,16 +78,16 @@ echo # install Git, git necessary repos
 
 apt-get install -y git
 cd /home/ubuntu
-sudo -u ubuntu git clone https://<GIT_USER>:<GIT_PASSWORD>@github.com/OasisLMF/Flamingo.git
+sudo -u ubuntu git clone https://<GIT_USER>:<GIT_PASSWORD>@github.com/OasisLMF/OasisUI.git
 sudo -u ubuntu git clone https://<GIT_USER>:<GIT_PASSWORD>@github.com/OasisLMF/OasisApi.git
 
 echo # copy necessary Oasis environment files from git directories to local directories
 
-cp -rf /home/ubuntu/Flamingo/Files /home/ubuntu/flamingo_share/
+cp -rf /home/ubuntu/OasisUI/Files /home/ubuntu/flamingo_share/
 
 echo # copy generic yml files from git directories to local directories
 
-cp /home/ubuntu/Flamingo/build/flamingo.yml /home/ubuntu/
+cp /home/ubuntu/OasisUI/build/flamingo.yml /home/ubuntu/
 cp /home/ubuntu/OasisApi/build/oasisapi.yml /home/ubuntu/
 cp /home/ubuntu/OasisApi/build/oasisworker.yml /home/ubuntu/
 
@@ -110,7 +110,7 @@ export PATH=$PATH:/opt/mssql-tools/bin
 echo ###############################################################################
 echo # create Oasis environment SQL databse on the SQL server
 
-cd /home/ubuntu/Flamingo/SQLFiles
+cd /home/ubuntu/OasisUI/SQLFiles
 chmod 711 create_db.py
 ./create_db.py -s <SQL_IP> -p <SQL_SA_PASSWORD> -n <SQL_ENV_NAME> -l <SQL_ENV_PASS> -f <SQL_ENV_FILES_LOC> -F <SHINY_ENV_FILES_LOC> -v <ENV_VERSION>
 
