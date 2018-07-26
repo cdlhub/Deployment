@@ -80,17 +80,11 @@ startupscript = startupscript.replace("<GIT_PASSWORD>", args.git_password)
 startupscript = startupscript.replace("<DOCKER_USER>", args.docker_user)
 startupscript = startupscript.replace("<DOCKER_PASSWORD>", args.docker_password)
 
-if ( args.local ):
-    local_install()
-else:
-    aws_install()
 
-def local_install():
-    """Run provisionning script locally"""
+if ( args.local ):
     subprocess.call([userdata_script])
 
-def aws_install():
-    """Start AWS EC2 instance and run provisionning script"""
+else:
     session = boto3.Session(profile_name=args.session_profile)
     ec2 = session.resource('ec2', region_name=config['Common']['region'])
 
