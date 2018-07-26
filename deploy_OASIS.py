@@ -43,7 +43,7 @@ config = configparser.ConfigParser()
 config.read(args.config)
 
 os_name = subprocess.check_output(['lsb_release', '-si']).lower()
-userdata_script = "shell-scripts/mid_system-init-" + os_name + ".sh"
+userdata_script = "shell-scripts/mid_system-init-" + os_name.decode("utf-8") + ".sh"
 
 # startup script that is injected and executed during the creation of the instance
 # with open ("Flamingo_Midtier_startupscript-centos.sh", "r") as myfile:
