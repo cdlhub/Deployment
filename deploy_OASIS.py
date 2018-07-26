@@ -42,10 +42,12 @@ args = parser.parse_args()
 config = configparser.ConfigParser()
 config.read(args.config)
 
-# startup script that is injected and executed during the creation of the instance
+os_name = subprocess.check_output(['lsb_release', '-si']).lower()
+userdata_script = "shell-scripts/mid_system-init-" + os_name + ".sh"
 
+# startup script that is injected and executed during the creation of the instance
 # with open ("Flamingo_Midtier_startupscript-centos.sh", "r") as myfile:
-with open ("shell-scripts/mid_system-init-ubuntu.sh", "r") as startup_file:
+with open (userdata_script, "r") as startup_file:
     startup_file_lines=startup_file.readlines()
 
 startupscript = "".join(startup_file_lines)
@@ -85,7 +87,7 @@ else:
 
 def local_install():
     """Run provisionning script locally"""
-    subprocess.call(['shell-scripts/mid_system-init-ubuntu.sh'])
+    subprocess.call([userdata_script])
 
 def aws_install():
     """Start AWS EC2 instance and run provisionning script"""
