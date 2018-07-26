@@ -19,6 +19,7 @@ python Flamingo_Midtier_CalcBE.py --key <aws-user-key-name> --sqlsapass sa_passw
 import argparse
 import boto3
 import configparser
+import subprocess
 
 # Read command line options
 
@@ -32,6 +33,7 @@ parser.add_argument('--gituser', action='store', dest='git_user', required=True,
 parser.add_argument('--gitpassword', action='store', dest='git_password', required=True, help='git user password')
 parser.add_argument('--dockeruser', action='store', dest='docker_user', required=True, help='docker user name')
 parser.add_argument('--dockerpassword', action='store', dest='docker_password', required=True, help='docker user password')
+parser.add_argument('--local', action='store_true', dest='local', default=False, help='run provisionning script locally')
 
 args = parser.parse_args()
 
@@ -76,43 +78,52 @@ startupscript = startupscript.replace("<GIT_PASSWORD>", args.git_password)
 startupscript = startupscript.replace("<DOCKER_USER>", args.docker_user)
 startupscript = startupscript.replace("<DOCKER_PASSWORD>", args.docker_password)
 
-# AWS instance specific settings
+if ( args.local ):
+    local_install()
+else:
+    aws_install()
 
-session = boto3.Session(profile_name=args.session_profile)
-ec2 = session.resource('ec2', region_name=config['Common']['region'])
+def local_install():
+    """Run provisionning script locally"""
+    subprocess.call(['shell-scripts/mid_system-init-ubuntu.sh'])
 
-instance = ec2.create_instances(
-    DryRun=args.dry_run,
-    ImageId=config['FlamingoServer']['ami'],
-    MinCount=1,
-    MaxCount=1,
-    KeyName=args.key_name,
-    SecurityGroupIds=[
-        config['FlamingoServer']['security_group'],
-    ],
-    UserData=startupscript,
-    InstanceType=config['FlamingoServer']['instance_type'],
-    BlockDeviceMappings=[
-        {
-            'DeviceName': '/dev/sda1', 
-            'Ebs': {
-                'VolumeSize': int(config['FlamingoServer']['volume_size']),
-                'VolumeType': config['FlamingoServer']['volume_type'],
-                # 'SnapshotId': config['FlamingoServer']['snapshot']
-            },
-        },
-    ],
-    SubnetId=config['FlamingoServer']['subnet'],
-    PrivateIpAddress=config['FlamingoServer']['ip'],
-    TagSpecifications=[
-        {
-            'ResourceType': 'instance',
-            'Tags': [
-                {
-                    'Key': 'Name',
-                    'Value': config['FlamingoServer']['name']
+def aws_install():
+    """Start AWS EC2 instance and run provisionning script"""
+    session = boto3.Session(profile_name=args.session_profile)
+    ec2 = session.resource('ec2', region_name=config['Common']['region'])
+
+    instance = ec2.create_instances(
+        DryRun=args.dry_run,
+        ImageId=config['FlamingoServer']['ami'],
+        MinCount=1,
+        MaxCount=1,
+        KeyName=args.key_name,
+        SecurityGroupIds=[
+            config['FlamingoServer']['security_group'],
+        ],
+        UserData=startupscript,
+        InstanceType=config['FlamingoServer']['instance_type'],
+        BlockDeviceMappings=[
+            {
+                'DeviceName': '/dev/sda1', 
+                'Ebs': {
+                    'VolumeSize': int(config['FlamingoServer']['volume_size']),
+                    'VolumeType': config['FlamingoServer']['volume_type'],
+                    # 'SnapshotId': config['FlamingoServer']['snapshot']
                 },
-            ]
-        },
-    ]
-)
+            },
+        ],
+        SubnetId=config['FlamingoServer']['subnet'],
+        PrivateIpAddress=config['FlamingoServer']['ip'],
+        TagSpecifications=[
+            {
+                'ResourceType': 'instance',
+                'Tags': [
+                    {
+                        'Key': 'Name',
+                        'Value': config['FlamingoServer']['name']
+                    },
+                ]
+            },
+        ]
+    )
