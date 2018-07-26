@@ -1,122 +1,135 @@
-#!/bin/bash
+#!/bin/bash -ex
 
-# update the OS
+# Variables
+OS_NAME=$(lsb_release -si | tr '[:upper:]' '[:lower:]')
+OS_VERION=$(lsb_release -sr)
+DOCKER_COMPOSE_VERSION="1.22.0"
+
+###############################################################################
+# Output logs to:
+# - /var/log/syslog
+# - /var/log/user-data.log
+# - Console
+exec > >(tee /var/log/user-data.log|logger -t user-data -s 2>/dev/console) 2>&1
+
+echo BEGIN
+
+echo "> updating the OS..."
 
 yum check-update
 yum update -y
 yum autoremove
 
-# install Docker-CE edition
+echo "> installing docker-ce edition..."
 
+# uninstall old versions
+yum remove docker docker-client docker-client-latest docker-common docker-latest docker-latest-logrotate docker-logrotate docker-selinux docker-engine-selinux docker-engine
+
+# install docker-ce
 yum install -y yum-utils device-mapper-persistent-data lvm2
-yum-config-manager --add-repo https://download.docker.com/linux/centos/docker-ce.repo
+yum-config-manager --add-repo https://download.docker.com/linux/${OS_NAME}/docker-ce.repo
 yum-config-manager --disable docker-ce-edge
-yum-config-manager --disable docker-ce-testing
+yum-config-manager --disable docker-ce-test
 yum makecache fast
 yum install -y docker-ce
-
-# modify Shiny Proxy startup
-
-sed -i 's/ExecStart=\/usr\/bin\/dockerd/ExecStart=\/usr\/bin\/dockerd -H unix:\/\/\/var\/run\/docker.sock -D -H tcp:\/\/0.0.0.0:2375/g' /lib/systemd/system/docker.service
-systemctl daemon-reload
 systemctl start docker
 
-# Docker post install tasks
+echo "> logging docker status..."
 
-usermod -aG docker centos
+docker run hello-world
+
+echo "> setting docker service deamon..."
+
+EXEC_START_LINE='ExecStart=/usr/bin/dockerd -H unix:///var/run/docker.sock -D -H tcp://0.0.0.0:2375'
+sed -i "/ExecStart=/c${EXEC_START_LINE}" /lib/systemd/system/docker.service
+systemctl daemon-reload
+systemctl stop docker
+systemctl start docker
+
+echo "> finalizing docker post install tasks..."
+
+usermod -aG docker ${OS_NAME}
 systemctl enable docker
 
-# install Docker-Compose
+echo "> installing docker-compose..."
 
-curl -L https://github.com/docker/compose/releases/download/1.14.0/docker-compose-`uname -s`-`uname -m` > /usr/local/bin/docker-compose
+curl -L https://github.com/docker/compose/releases/download/${DOCKER_COMPOSE_VERSION}/docker-compose-$(uname -s)-$(uname -m) -o /usr/local/bin/docker-compose
 chmod +x /usr/local/bin/docker-compose
 
-# create Oasis environment directories
+echo "> creating Oasis environment directories..."
 
-sudo -u centos mkdir /home/centos/download
-sudo -u centos mkdir /home/centos/upload
-sudo -u centos mkdir /home/centos/model_data
+sudo -u ${OS_NAME} mkdir /home/${OS_NAME}/download
+sudo -u ${OS_NAME} mkdir /home/${OS_NAME}/upload
+sudo -u ${OS_NAME} mkdir /home/${OS_NAME}/model_data
 
-# setup the SQL shared directory
+echo "> setting SQL shared directory..."
 
 yum install -y cifs-utils
-sudo -u centos mkdir /home/centos/flamingo_share
-echo "username=<FLAMINGO_SHARE_USER>" > /home/centos/.flamingo_share_credentials
-echo "password=<FLAMINGO_SHARE_PASSWORD>" >> /home/centos/.flamingo_share_credentials
-chown centos:centos /home/centos/.flamingo_share_credentials
-chmod 600 /home/centos/.flamingo_share_credentials
-echo "//<SQL_IP>/flamingo_share /home/centos/flamingo_share cifs uid=1000,gid=1000,rw,credentials=/home/centos/.flamingo_share_credentials,iocharset=utf8,dir_mode=0775,noperm,sec=ntlm 0 0" >> /etc/fstab
+sudo -u ${OS_NAME} mkdir /home/${OS_NAME}/flamingo_share
+echo "username=<FLAMINGO_SHARE_USER>" > /home/${OS_NAME}/.flamingo_share_credentials
+echo "password=<FLAMINGO_SHARE_PASSWORD>" >> /home/${OS_NAME}/.flamingo_share_credentials
+chown ${OS_NAME}:${OS_NAME} /home/${OS_NAME}/.flamingo_share_credentials
+chmod 600 /home/${OS_NAME}/.flamingo_share_credentials
+echo "//<SQL_IP>/flamingo_share /home/${OS_NAME}/flamingo_share cifs uid=1000,gid=1000,rw,credentials=/home/${OS_NAME}/.flamingo_share_credentials,iocharset=utf8,dir_mode=0775,noperm,sec=ntlm 0 0" >> /etc/fstab
 mount -a
 
-# install Git, git necessary repos
+echo "> installing git, and necessary repositories..."
 
 yum install -y git
-cd /home/centos
-sudo -u centos git clone https://<GIT_USER>:<GIT_PASSWORD>@github.com/OasisLMF/OasisUI.git
-sudo -u centos git clone https://<GIT_USER>:<GIT_PASSWORD>@github.com/OasisLMF/OasisApi.git
-sudo -u centos git clone https://<GIT_USER>:<GIT_PASSWORD>@github.com/OasisLMF/OasisPiWind.git
+cd /home/${OS_NAME}
+sudo -u ${OS_NAME} git clone https://<GIT_USER>:<GIT_PASSWORD>@github.com/OasisLMF/OasisUI.git
+sudo -u ${OS_NAME} git clone https://<GIT_USER>:<GIT_PASSWORD>@github.com/OasisLMF/OasisApi.git
 
-# copy necessary Oasis environment files from git directories to local directories
+echo "> copying necessary Oasis environment files from git directories to local directories..."
 
-cp -rf /home/centos/OasisUI/Files /home/centos/flamingo_share/
-cp -rf /home/centos/OasisPiWind/flamingo/PiWind/Files/TransformationFiles/*.* /home/centos/flamingo_share/Files/TransformationFiles/
-cp -rf /home/centos/OasisPiWind/flamingo/PiWind/Files/ValidationFiles/*.* /home/centos/flamingo_share/Files/ValidationFiles/
-cp -rf /home/centos/OasisPiWind/model_data/PiWind/*.* /home/centos/model_data/
+cp -rf /home/${OS_NAME}/OasisUI/Files /home/${OS_NAME}/flamingo_share/
 
-# copy generic yml files from git directories to local directories
+echo "> copying generic yml files from git directories to local directories..."
 
-cp /home/centos/OasisUI/build/flamingo.yml /home/centos/
-cp /home/centos/OasisApi/build/oasisapi.yml /home/centos/
-cp /home/centos/OasisApi/build/oasisworker.yml /home/centos/
-cp /home/centos/OasisPiWind/build/oasispiwindkeysserver.yml /home/centos/
+cp /home/${OS_NAME}/OasisUI/build/flamingo.yml /home/${OS_NAME}/
+cp /home/${OS_NAME}/OasisApi/build/oasisapi.yml /home/${OS_NAME}/
+cp /home/${OS_NAME}/OasisApi/build/oasisworker.yml /home/${OS_NAME}/
 
-# install SQL server command line tools for Linux
+echo "> installing SQL server command line tools for Linux..."
 
-sudo curl -o /etc/yum.repos.d/msprod.repo https://packages.microsoft.com/config/rhel/7/prod.repo
+sudo curl https://packages.microsoft.com/config/${OS_NAME}/${OS_VERSION}/prod.repo > /etc/yum.repos.d/msprod.repo
 sudo yum update -y
+sudo yum remove unixODBC-utf16 unixODBC-utf16-devel
 sudo ACCEPT_EULA=Y yum install -y mssql-tools unixODBC-devel
+echo 'export PATH="$PATH:/opt/mssql-tools/bin"' >> ~/.bash_profile
+echo 'export PATH="$PATH:/opt/mssql-tools/bin"' >> /home/${OS_NAME}/.bash_profile
 echo 'export PATH="$PATH:/opt/mssql-tools/bin"' >> ~/.bashrc
-echo 'export PATH="$PATH:/opt/mssql-tools/bin"' >> /home/centos/.bashrc
-export PATH=$PATH:/opt/mssql-tools/bin
+echo 'export PATH="$PATH:/opt/mssql-tools/bin"' >> /home/${OS_NAME}/.bashrc
+export PATH=${PATH}:/opt/mssql-tools/bin
 
-# create Oasis environment SQL databse on the SQL server
+echo "> creating Oasis environment SQL databse on the SQL server..."
 
-cd /home/centos/OasisUI/SQLFiles
-chmod 711 aws_create_db.py
+cd /home/${OS_NAME}/OasisUI/SQLFiles
+chmod 711 create_db.py
 ./create_db.py -s <SQL_IP> -p <SQL_SA_PASSWORD> -n <SQL_ENV_NAME> -l <SQL_ENV_PASS> -f <SQL_ENV_FILES_LOC> -F <SHINY_ENV_FILES_LOC> -v <ENV_VERSION>
 
-# load model data into the Oasis environment SQL database
+echo "> modifying generic yml files to specific Oasis environment yml files..."
 
-cd /home/centos/OasisPiWind/flamingo/PiWind/SQLFiles
-chmod 711 load_data.py
-./load_data.py -s <SQL_IP> -n <SQL_ENV_NAME> -l <SQL_ENV_PASS> -a <KEYS_SERVICE_IP> -A <KEYS_SERVICE_PORT> -o <OASIS_API_IP> -O <OASIS_API_PORT>
-
-# modify generic yml files to specific Oasis environment yml files
-
-cd /home/centos
+cd /home/${OS_NAME}
 sed -i 's/__oasis_release_tag__/<OASIS_RELEASE_TAG>/g' oasisapi.yml
-sed -i 's/__oasis_release_tag__/<OASIS_RELEASE_TAG>/g' oasisworker.yml
-sed -i 's/__ip_address__/<IP_ADDRESS>/g' oasisworker.yml
-sed -i 's/__model_supplier__/<MODEL_SUPPLIER>/g' oasisworker.yml
-sed -i 's/__model_version__/<MODEL_VERSION>/g' oasisworker.yml
 sed -i 's/__flamingo_release_tag__/<FLAMINGO_RELEASE_TAG>/g' flamingo.yml
 sed -i 's/__sql_env_name__/<SQL_ENV_NAME>/g' flamingo.yml
 sed -i 's/__sql_ip__/<SQL_IP>/g' flamingo.yml
 sed -i 's/__sql_port__/<SQL_PORT>/g' flamingo.yml
 sed -i 's/__sql_env_pass__/<SQL_ENV_PASS>/g' flamingo.yml
-sed -i 's/__ip_address__/<ip_address>/g' flamingo.yml
+sed -i 's/__ip_address__/<IP_ADDRESS>/g' flamingo.yml
 
-# log in to dockerhub
+echo "> logging in to dockerhub..."
 
 docker login -u <DOCKER_USER> -p <DOCKER_PASSWORD>
 
-# pull flamingo shiny image from dockerhub
+echo "> pulling flamingo shiny image from dockerhub..."
 
 docker pull coreoasis/flamingo_shiny:<FLAMINGO_RELEASE_TAG>
 
-# run Oasis environment specific yml files to create the Oasis environment
+echo "> running Oasis environment specific yml files to create the Oasis environment..."
 
-docker-compose -f oasispiwindkeysserver.yml up -d
 docker-compose -f oasisapi.yml up -d
-docker-compose -f oasisworker.yml up -d
 docker-compose -f flamingo.yml up -d
+
+echo END
