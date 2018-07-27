@@ -10,6 +10,7 @@ import argparse
 import configparser
 import os
 import paramiko
+import subprocess
 
 # Read command line options
 
