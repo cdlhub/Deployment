@@ -11,6 +11,7 @@ import configparser
 import os
 import paramiko
 import subprocess
+import sys
 
 # Read command line options
 
