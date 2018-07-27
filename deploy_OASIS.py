@@ -87,6 +87,7 @@ if ( args.local ):
     tmp_script_name = userdata_script_path + "/" + "_" + userdata_script_name 
     with open (tmp_script_name, "w") as tmp_script:
         tmp_script.write(startupscript)
+    os.chmod(tmp_script_name, 0o700)
 
     subprocess.call([tmp_script_name])
 
