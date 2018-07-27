@@ -84,7 +84,6 @@ startupscript = startupscript.replace("<GIT_PASSWORD>", args.git_password)
 startupscript = startupscript.replace("<DOCKER_USER>", args.docker_user)
 startupscript = startupscript.replace("<DOCKER_PASSWORD>", args.docker_password)
 
-
 if ( args.local ):
     tmp_script_name = userdata_script_path + "/" + "_" + userdata_script_name 
     with open (tmp_script_name, "w") as tmp_script:

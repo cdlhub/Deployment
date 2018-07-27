@@ -24,6 +24,7 @@ parser.add_argument('--gituser', action='store', dest='git_user', required=True,
 parser.add_argument('--gitpassword', action='store', dest='git_password', required=True, help='git user password')
 parser.add_argument('--dockeruser', action='store', dest='docker_user', required=True, help='docker user name')
 parser.add_argument('--dockerpassword', action='store', dest='docker_password', required=True, help='docker user password')
+parser.add_argument('--local', action='store_true', dest='local', required=False, help='run the script locally')
 
 args = parser.parse_args()
 
@@ -60,6 +61,18 @@ script = script.replace("<KEYS_SERVICE_IP>", config['FlamingoServer']['ip'])
 script = script.replace("<KEYS_SERVICE_PORT>", config['PiWind']['keys_service_port'])
 script = script.replace("<MODEL_SUPPLIER>", config['PiWind']['model_supplier'])
 script = script.replace("<MODEL_VERSION>", config['PiWind']['model_version'])
+
+if ( args.local ):
+    tmp_script_name = "shell-scripts/install-piwind.sh"
+    with open (tmp_script_name, "w") as tmp_script:
+        tmp_script.write(script)
+    os.chmod(tmp_script_name, 0o700)
+
+    subprocess.call(['sudo', tmp_script_name])
+
+    os.remove(tmp_script_name)
+    sys.exit(0)
+
 
 # Run install script via ssh
 
