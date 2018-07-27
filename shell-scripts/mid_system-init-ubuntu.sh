@@ -2,7 +2,7 @@
 
 # Variables
 OS_NAME=$(lsb_release -si | tr '[:upper:]' '[:lower:]')
-OS_VERION=$(lsb_release -sr)
+OS_VERSION=$(lsb_release -sr)
 DOCKER_COMPOSE_VERSION="1.22.0"
 
 ###############################################################################
