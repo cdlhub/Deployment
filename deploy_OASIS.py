@@ -19,6 +19,7 @@ python Flamingo_Midtier_CalcBE.py --key <aws-user-key-name> --sqlsapass sa_passw
 import argparse
 import boto3
 import configparser
+import os
 import subprocess
 
 # Read command line options
