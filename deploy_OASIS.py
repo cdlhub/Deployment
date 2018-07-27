@@ -82,44 +82,50 @@ startupscript = startupscript.replace("<DOCKER_PASSWORD>", args.docker_password)
 
 
 if ( args.local ):
-    subprocess.call([userdata_script])
+    tmp_file_name = "_" + userdata_script
+    with open (tmp_file_name, "w") as tmp_script:
+        tmp_script.write(startupscript)
 
-else:
-    session = boto3.Session(profile_name=args.session_profile)
-    ec2 = session.resource('ec2', region_name=config['Common']['region'])
+    subprocess.call([tmp_file_name])
 
-    instance = ec2.create_instances(
-        DryRun=args.dry_run,
-        ImageId=config['FlamingoServer']['ami'],
-        MinCount=1,
-        MaxCount=1,
-        KeyName=args.key_name,
-        SecurityGroupIds=[
-            config['FlamingoServer']['security_group'],
-        ],
-        UserData=startupscript,
-        InstanceType=config['FlamingoServer']['instance_type'],
-        BlockDeviceMappings=[
-            {
-                'DeviceName': '/dev/sda1', 
-                'Ebs': {
-                    'VolumeSize': int(config['FlamingoServer']['volume_size']),
-                    'VolumeType': config['FlamingoServer']['volume_type'],
-                    # 'SnapshotId': config['FlamingoServer']['snapshot']
+    os.remove(tmp_file_name)
+    sys.exit(0)
+
+session = boto3.Session(profile_name=args.session_profile)
+ec2 = session.resource('ec2', region_name=config['Common']['region'])
+
+instance = ec2.create_instances(
+    DryRun=args.dry_run,
+    ImageId=config['FlamingoServer']['ami'],
+    MinCount=1,
+    MaxCount=1,
+    KeyName=args.key_name,
+    SecurityGroupIds=[
+        config['FlamingoServer']['security_group'],
+    ],
+    UserData=startupscript,
+    InstanceType=config['FlamingoServer']['instance_type'],
+    BlockDeviceMappings=[
+        {
+            'DeviceName': '/dev/sda1', 
+            'Ebs': {
+                'VolumeSize': int(config['FlamingoServer']['volume_size']),
+                'VolumeType': config['FlamingoServer']['volume_type'],
+                # 'SnapshotId': config['FlamingoServer']['snapshot']
+            },
+        },
+    ],
+    SubnetId=config['FlamingoServer']['subnet'],
+    PrivateIpAddress=config['FlamingoServer']['ip'],
+    TagSpecifications=[
+        {
+            'ResourceType': 'instance',
+            'Tags': [
+                {
+                    'Key': 'Name',
+                    'Value': config['FlamingoServer']['name']
                 },
-            },
-        ],
-        SubnetId=config['FlamingoServer']['subnet'],
-        PrivateIpAddress=config['FlamingoServer']['ip'],
-        TagSpecifications=[
-            {
-                'ResourceType': 'instance',
-                'Tags': [
-                    {
-                        'Key': 'Name',
-                        'Value': config['FlamingoServer']['name']
-                    },
-                ]
-            },
-        ]
-    )
+            ]
+        },
+    ]
+)
