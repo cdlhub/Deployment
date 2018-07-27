@@ -42,8 +42,10 @@ args = parser.parse_args()
 config = configparser.ConfigParser()
 config.read(args.config)
 
-os_name = subprocess.check_output(['lsb_release', '-si']).lower()
-userdata_script = "shell-scripts/mid_system-init-" + os_name.decode("utf-8")[:-1] + ".sh"
+os_name = subprocess.check_output(['lsb_release', '-si']).lower().decode("utf-8")[:-1]
+userdata_script_path = "shell-scripts"
+userdata_script_name = "mid_system-init-" + os_name + ".sh"
+userdata_script = userdata_script_path + "/" + userdata_script_name
 
 # startup script that is injected and executed during the creation of the instance
 # with open ("Flamingo_Midtier_startupscript-centos.sh", "r") as myfile:
@@ -82,13 +84,13 @@ startupscript = startupscript.replace("<DOCKER_PASSWORD>", args.docker_password)
 
 
 if ( args.local ):
-    tmp_file_name = "_" + userdata_script
-    with open (tmp_file_name, "w") as tmp_script:
+    tmp_script_name = userdata_script_path + "/" + "_" + userdata_script_name 
+    with open (tmp_script_name, "w") as tmp_script:
         tmp_script.write(startupscript)
 
-    subprocess.call([tmp_file_name])
+    subprocess.call([tmp_script_name])
 
-    os.remove(tmp_file_name)
+    os.remove(tmp_script_name)
     sys.exit(0)
 
 session = boto3.Session(profile_name=args.session_profile)
