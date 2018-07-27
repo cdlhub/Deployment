@@ -65,14 +65,14 @@ script = script.replace("<MODEL_SUPPLIER>", config['PiWind']['model_supplier'])
 script = script.replace("<MODEL_VERSION>", config['PiWind']['model_version'])
 
 if ( args.local ):
-    tmp_script_name = "shell-scripts/install-piwind.sh"
+    tmp_script_name = "shell-scripts/install_piwind.sh"
     with open (tmp_script_name, "w") as tmp_script:
         tmp_script.write(script)
     os.chmod(tmp_script_name, 0o700)
 
     subprocess.call(['sudo', tmp_script_name])
 
-    os.remove(tmp_script_name)
+    # os.remove(tmp_script_name)
     sys.exit(0)
 
 
