@@ -21,6 +21,7 @@ import boto3
 import configparser
 import os
 import subprocess
+import sys
 
 # Read command line options
 
