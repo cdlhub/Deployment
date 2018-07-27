@@ -3,7 +3,7 @@
 # Variables
 OS_NAME=$(lsb_release -si | tr '[:upper:]' '[:lower:]')
 
-exec &> >(tee -a install-piwind.log)
+# exec &> >(tee -a install-piwind.log)
 
 echo "[$(date)] BEGIN"
 
