@@ -90,7 +90,7 @@ if ( args.local ):
         tmp_script.write(startupscript)
     os.chmod(tmp_script_name, 0o700)
 
-    subprocess.call([tmp_script_name])
+    subprocess.call(['sudo', tmp_script_name])
 
     os.remove(tmp_script_name)
     sys.exit(0)
