@@ -47,7 +47,7 @@ parser = argparse.ArgumentParser(description='Provision Flamingo server and dock
 
 parser.add_argument('--config', action='store', dest='config', default='config.ini', help='set INI configuration file name (default: config.ini)')
 parser.add_argument('--session', action='store', dest='session_profile', default='default', required=False, help='AWS profile to get credentials')
-parser.add_argument('--key', action='store', dest='key_name', required=True, help='AWS access key file name to access the instace')
+parser.add_argument('--key', action='store', dest='key_name', required=False, help='AWS access key file name to access the instace')
 parser.add_argument('--dryrun', action='store_true', dest='dry_run', default=False, help='flag to perform a dry run')
 parser.add_argument('--gituser', action='store', dest='git_user', required=True, help='git user name')
 parser.add_argument('--gitpassword', action='store', dest='git_password', required=True, help='git user password')
