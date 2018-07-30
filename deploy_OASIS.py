@@ -4,16 +4,34 @@
 """
 This script can be used to create a AWS EC2 instance to hold Flamingo server.
 It connects to SQL Server to configure the connection between both servers.
+It can also be used directly on the Flamingo server using `--local` option.
 
 Your Docker and Git login credentials have to be added to the correct repos
 at Oasis Dockerhub and Git accounts.
 
 This script depends on a successful installation  and configuration of the SQL server;
-this can be accomplished by running the SQL script first (`SQLPublic.py`).
+this can be accomplished by running the SQL script first (`deploy_SQL.py`).
 
-Command sample for Ubuntu 16.04:
+Example 1: Deploy on AWS
 
-python Flamingo_Midtier_CalcBE.py --key <aws-user-key-name> --sqlsapass sa_password --sqlenvpass piwind  --gituser <abc> --gitpassword <abc> --dockeruser <abc> --dockerpassword <abc> --session <aws-profile>
+python deploy_OASIS.py --config config.ini \
+                       --osname centos \
+                       --key <aws-user-key-name> \
+                       --gituser <git-user> \
+                       --gitpassword <git-password> \
+                       --dockeruser <docker-user> \
+                       --dockerpassword <docker-password>
+
+Example 2: Deploy on local Ubuntu server
+
+python deploy_OASIS.py --config config.ini \
+                       --osname ubuntu \
+                       --local \
+                       --gituser <git-user> \
+                       --gitpassword <git-password> \
+                       --dockeruser <docker-user> \
+                       --dockerpassword <docker-password>
+
 """
 
 import argparse
@@ -36,6 +54,7 @@ parser.add_argument('--gitpassword', action='store', dest='git_password', requir
 parser.add_argument('--dockeruser', action='store', dest='docker_user', required=True, help='docker user name')
 parser.add_argument('--dockerpassword', action='store', dest='docker_password', required=True, help='docker user password')
 parser.add_argument('--local', action='store_true', dest='local', default=False, help='run provisionning script locally')
+parser.add_argument('--osname', action='store', dest='osname', default='ubuntu', help='name of Flamingo server OS (either ubuntu, or centos)')
 
 args = parser.parse_args()
 
@@ -44,7 +63,7 @@ args = parser.parse_args()
 config = configparser.ConfigParser()
 config.read(args.config)
 
-os_name = subprocess.check_output(['lsb_release', '-si']).lower().decode("utf-8")[:-1]
+os_name = args.osname.lower()
 userdata_script_path = "shell-scripts"
 userdata_script_name = "mid_system-init-" + os_name + ".sh"
 userdata_script = userdata_script_path + "/" + userdata_script_name
@@ -84,6 +103,7 @@ startupscript = startupscript.replace("<GIT_PASSWORD>", args.git_password)
 startupscript = startupscript.replace("<DOCKER_USER>", args.docker_user)
 startupscript = startupscript.replace("<DOCKER_PASSWORD>", args.docker_password)
 
+# Local install
 if ( args.local ):
     tmp_script_name = userdata_script_path + "/" + "_" + userdata_script_name 
     with open (tmp_script_name, "w") as tmp_script:
@@ -95,6 +115,7 @@ if ( args.local ):
     os.remove(tmp_script_name)
     sys.exit(0)
 
+# AWS install
 session = boto3.Session(profile_name=args.session_profile)
 ec2 = session.resource('ec2', region_name=config['Common']['region'])
 
