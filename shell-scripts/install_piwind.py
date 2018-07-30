@@ -15,7 +15,7 @@ Example (you need a valid `config.ini` file):
 python install_piwind.py --sshuser ubuntu \
                          --host <oasis-server-ip> \
                          --config config.ini \
-                         --key <aws-key-file.pem>
+                         --key <aws-user-key-name>
                          --gituser <git-user> \
                          --gitpassword <git-password> \
                          --dockeruser <docker-user> \
