@@ -33,6 +33,7 @@ if [ "$1" == "up" ]; then
     load_config
     docker pull coreoasis/flamingo_shiny:$RELEASE_TAG
     echo 'Starting Oasis'
+    docker-compose $COMPOSE_FILES pull "${@:2}"
     docker-compose $COMPOSE_FILES up -d "${@:2}"
 elif [ "$1" == "down" ]; then
     load_config
