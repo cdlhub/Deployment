@@ -80,8 +80,8 @@ echo "> installing git, and necessary repositories..."
 
 apt-get install -y git
 cd /home/${OS_NAME}
-sudo -u ${OS_NAME} git clone https://<GIT_USER>:<GIT_PASSWORD>@github.com/OasisLMF/OasisUI.git
-sudo -u ${OS_NAME} git clone https://<GIT_USER>:<GIT_PASSWORD>@github.com/OasisLMF/OasisApi.git
+sudo -u ${OS_NAME} git clone git://github.com/OasisLMF/OasisUI.git
+sudo -u ${OS_NAME} git clone git://github.com/OasisLMF/OasisApi.git
 
 echo "> copying necessary Oasis environment files from git directories to local directories..."
 
@@ -121,10 +121,6 @@ sed -i 's/__sql_ip__/<SQL_IP>/g' flamingo.yml
 sed -i 's/__sql_port__/<SQL_PORT>/g' flamingo.yml
 sed -i 's/__sql_env_pass__/<SQL_ENV_PASS>/g' flamingo.yml
 sed -i 's/__ip_address__/<IP_ADDRESS>/g' flamingo.yml
-
-echo "> logging in to dockerhub..."
-
-docker login -u <DOCKER_USER> -p <DOCKER_PASSWORD>
 
 echo "> pulling flamingo shiny image from dockerhub..."
 

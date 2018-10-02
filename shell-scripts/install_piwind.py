@@ -16,20 +16,12 @@ python install_piwind.py --sshuser ubuntu \
                          --host <oasis-server-ip> \
                          --config config.ini \
                          --key <aws-user-key-name>
-                         --gituser <git-user> \
-                         --gitpassword <git-password> \
-                         --dockeruser <docker-user> \
-                         --dockerpassword <docker-password>
                         
 - Installing PiWind from within the OASIS server. `install_piwind.py` and `install-piwind-template.sh`
   must be uploaded first on the server:
 
 python install_piwind.py --local \
-                         --config config.ini \
-                         --gituser <git-user> \
-                         --gitpassword <git-password> \
-                         --dockeruser <docker-user> \
-                         --dockerpassword <docker-password>
+                         --config config.ini
 """
 
 import argparse
@@ -48,10 +40,6 @@ parser.add_argument("--host", action='store', dest='hostname', required=False, h
 parser.add_argument('--config', action='store', dest='config', default='config.ini', help='set INI configuration file name (default: config.ini)')
 parser.add_argument('--session', action='store', dest='session_profile', default='default', required=False, help='AWS profile to get credentials')
 parser.add_argument('--key', action='store', dest='key_name', required=False, help='AWS access key file name to access the instace (required for AWS instance)')
-parser.add_argument('--gituser', action='store', dest='git_user', required=True, help='git user name')
-parser.add_argument('--gitpassword', action='store', dest='git_password', required=True, help='git user password')
-parser.add_argument('--dockeruser', action='store', dest='docker_user', required=True, help='docker user name')
-parser.add_argument('--dockerpassword', action='store', dest='docker_password', required=True, help='docker user password')
 parser.add_argument('--local', action='store_true', dest='local', required=False, help='run the script locally')
 
 args = parser.parse_args()
@@ -67,10 +55,6 @@ with open ("shell-scripts/install-piwind-template.sh", "r") as f:
     lines = f.readlines()
 
 script = "".join(lines)
-script = script.replace("<GIT_USER>", args.git_user)
-script = script.replace("<GIT_PASSWORD>", args.git_password)
-script = script.replace("<DOCKER_USER>", args.docker_user)
-script = script.replace("<DOCKER_PASSWORD>", args.docker_password)
 
 script = script.replace("<FLAMINGO_SHARE_USER>", config['SqlServer']['flamingo_share_user'])
 script = script.replace("<FLAMINGO_SHARE_PASSWORD>", config['SqlServer']['flamingo_share_password'])
