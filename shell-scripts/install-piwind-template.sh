@@ -9,6 +9,7 @@ echo "[$(date)] BEGIN"
 
 echo "> cloning PiWind repository..."
 
+cd /home/${OS_NAME}
 git clone git://github.com/OasisLMF/OasisPiWind.git
 
 echo "> copying PiWind files..."
