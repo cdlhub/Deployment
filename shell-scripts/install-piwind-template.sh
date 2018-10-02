@@ -9,7 +9,8 @@ echo "[$(date)] BEGIN"
 
 echo "> cloning PiWind repository..."
 
-git clone https://<GIT_USER>:<GIT_PASSWORD>@github.com/OasisLMF/OasisPiWind.git
+# git clone https://<GIT_USER>:<GIT_PASSWORD>@github.com/OasisLMF/OasisPiWind.git
+git clone git://github.com/OasisLMF/OasisPiWind.git
 
 echo "> copying PiWind files..."
 
@@ -35,7 +36,7 @@ sed -i 's/__model_version__/<MODEL_VERSION>/g' oasisworker.yml
 
 echo "> starting docker containers..."
 
-docker login -u <DOCKER_USER> -p <DOCKER_PASSWORD>
+# docker login -u <DOCKER_USER> -p <DOCKER_PASSWORD>
 docker-compose -f oasispiwindkeysserver.yml up -d
 docker-compose -f oasisworker.yml up -d
 

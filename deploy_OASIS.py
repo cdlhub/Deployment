@@ -49,10 +49,10 @@ parser.add_argument('--config', action='store', dest='config', default='config.i
 parser.add_argument('--session', action='store', dest='session_profile', default='default', required=False, help='AWS profile to get credentials')
 parser.add_argument('--key', action='store', dest='key_name', required=False, help='AWS access key file name to access the instace')
 parser.add_argument('--dryrun', action='store_true', dest='dry_run', default=False, help='flag to perform a dry run')
-parser.add_argument('--gituser', action='store', dest='git_user', required=True, help='git user name')
-parser.add_argument('--gitpassword', action='store', dest='git_password', required=True, help='git user password')
-parser.add_argument('--dockeruser', action='store', dest='docker_user', required=True, help='docker user name')
-parser.add_argument('--dockerpassword', action='store', dest='docker_password', required=True, help='docker user password')
+# parser.add_argument('--gituser', action='store', dest='git_user', required=True, help='git user name')
+# parser.add_argument('--gitpassword', action='store', dest='git_password', required=True, help='git user password')
+# parser.add_argument('--dockeruser', action='store', dest='docker_user', required=True, help='docker user name')
+# parser.add_argument('--dockerpassword', action='store', dest='docker_password', required=True, help='docker user password')
 parser.add_argument('--local', action='store_true', dest='local', default=False, help='run provisionning script locally')
 parser.add_argument('--osname', action='store', dest='osname', default='ubuntu', help='name of Flamingo server OS (either ubuntu, or centos)')
 
@@ -98,10 +98,10 @@ startupscript = startupscript.replace("<KEYS_SERVICE_PORT>", config['PiWind']['k
 startupscript = startupscript.replace("<MODEL_SUPPLIER>", config['PiWind']['model_supplier'])
 startupscript = startupscript.replace("<MODEL_VERSION>", config['PiWind']['model_version'])
 # GitHub and DockerHub
-startupscript = startupscript.replace("<GIT_USER>", args.git_user)
-startupscript = startupscript.replace("<GIT_PASSWORD>", args.git_password)
-startupscript = startupscript.replace("<DOCKER_USER>", args.docker_user)
-startupscript = startupscript.replace("<DOCKER_PASSWORD>", args.docker_password)
+# startupscript = startupscript.replace("<GIT_USER>", args.git_user)
+# startupscript = startupscript.replace("<GIT_PASSWORD>", args.git_password)
+# startupscript = startupscript.replace("<DOCKER_USER>", args.docker_user)
+# startupscript = startupscript.replace("<DOCKER_PASSWORD>", args.docker_password)
 
 # Local install
 if ( args.local ):
