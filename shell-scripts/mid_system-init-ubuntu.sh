@@ -73,7 +73,7 @@ echo "username=<FLAMINGO_SHARE_USER>" > /home/${OS_NAME}/.flamingo_share_credent
 echo "password=<FLAMINGO_SHARE_PASSWORD>" >> /home/${OS_NAME}/.flamingo_share_credentials
 chown ${OS_NAME}:${OS_NAME} /home/${OS_NAME}/.flamingo_share_credentials
 chmod 600 /home/${OS_NAME}/.flamingo_share_credentials
-echo "//<SQL_IP>/flamingo_share /home/${OS_NAME}/flamingo_share cifs uid=1000,gid=1000,rw,credentials=/home/${OS_NAME}/.flamingo_share_credentials,iocharset=utf8,dir_mode=0775,noperm,sec=ntlm 0 0" >> /etc/fstab
+echo "//<SQL_IP>/flamingo_share /home/${OS_NAME}/flamingo_share cifs vers=1.0,uid=1000,gid=1000,rw,credentials=/home/${OS_NAME}/.flamingo_share_credentials,iocharset=utf8,dir_mode=0775,noperm,sec=ntlm 0 0" >> /etc/fstab
 mount -a
 
 echo "> installing git, and necessary repositories..."
