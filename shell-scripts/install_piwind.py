@@ -70,9 +70,10 @@ script = script.replace("<OASIS_API_PORT>", config['Oasis']['api_port'])
 script = script.replace("<OASIS_RELEASE_TAG>", config['Oasis']['oasis_release_tag'])
 
 script = script.replace("<KEYS_SERVICE_IP>", config['FlamingoServer']['ip'])
-script = script.replace("<KEYS_SERVICE_PORT>", config['PiWind']['keys_service_port'])
-script = script.replace("<MODEL_SUPPLIER>", config['PiWind']['model_supplier'])
-script = script.replace("<MODEL_VERSION>", config['PiWind']['model_version'])
+script = script.replace("<PIWIND_KEYS_SERVICE_PORT>", config['PiWind']['keys_service_port'])
+script = script.replace("<MODEL_SUPPLIER>", config['PiWind']['supplier'])
+script = script.replace("<MODEL_VERSION>", config['PiWind']['version'])
+script = script.replace("<PIWIND_RELEASE_TAG>", config['PiWind']['release_tag'])
 
 if ( args.local ):
     tmp_script_name = "shell-scripts/install_piwind.sh"

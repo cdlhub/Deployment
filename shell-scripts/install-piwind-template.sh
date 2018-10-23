@@ -29,6 +29,8 @@ PATH="$PATH":/opt/mssql-tools/bin
 echo "> configuring worker files..."
 
 cd /home/${OS_NAME}
+sed -i 's/__release_tag__/<PIWIND_RELEASE_TAG>/g' oasispiwindkeysserver.yml
+sed -i 's/__keys_service_port__/<PIWIND_KEYS_SERVICE_PORT>/g' oasispiwindkeysserver.yml
 sed -i 's/__oasis_release_tag__/<OASIS_RELEASE_TAG>/g' oasisworker.yml
 sed -i 's/__ip_address__/<IP_ADDRESS>/g' oasisworker.yml
 sed -i 's/__model_supplier__/<MODEL_SUPPLIER>/g' oasisworker.yml
