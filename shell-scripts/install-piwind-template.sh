@@ -14,7 +14,7 @@ git clone git://github.com/OasisLMF/OasisPiWind.git
 
 echo "> copying PiWind files..."
 
-cp /home/${OS_NAME}/OasisPiWind/build/oasispiwindkeysserver.yml /home/${OS_NAME}/
+cp -f /home/${OS_NAME}/OasisPiWind/build/oasispiwindkeysserver.yml /home/${OS_NAME}/
 cp -rf /home/${OS_NAME}/OasisPiWind/flamingo/PiWind/Files/TransformationFiles/*.* /home/${OS_NAME}/flamingo_share/Files/TransformationFiles/
 cp -rf /home/${OS_NAME}/OasisPiWind/flamingo/PiWind/Files/ValidationFiles/*.* /home/${OS_NAME}/flamingo_share/Files/ValidationFiles/
 cp -rf /home/${OS_NAME}/OasisPiWind/model_data/PiWind/*.* /home/${OS_NAME}/model_data/
