@@ -65,7 +65,7 @@ sudo -u ${OS_NAME} mkdir -p /home/${OS_NAME}/model_data
 echo "> setting SQL shared directory..."
 
 yum install -y cifs-utils
-sudo -u ${OS_NAME} mkdir /home/${OS_NAME}/flamingo_share
+sudo -u ${OS_NAME} mkdir -p /home/${OS_NAME}/flamingo_share
 echo "username=<FLAMINGO_SHARE_USER>" > /home/${OS_NAME}/.flamingo_share_credentials
 echo "password=<FLAMINGO_SHARE_PASSWORD>" >> /home/${OS_NAME}/.flamingo_share_credentials
 chown ${OS_NAME}:${OS_NAME} /home/${OS_NAME}/.flamingo_share_credentials
