@@ -58,9 +58,9 @@ chmod +x /usr/local/bin/docker-compose
 
 echo "> creating Oasis environment directories..."
 
-sudo -u ${OS_NAME} mkdir /home/${OS_NAME}/download
-sudo -u ${OS_NAME} mkdir /home/${OS_NAME}/upload
-sudo -u ${OS_NAME} mkdir /home/${OS_NAME}/model_data
+sudo -u ${OS_NAME} mkdir -p /home/${OS_NAME}/download
+sudo -u ${OS_NAME} mkdir -p /home/${OS_NAME}/upload
+sudo -u ${OS_NAME} mkdir -p /home/${OS_NAME}/model_data
 
 echo "> setting SQL shared directory..."
 

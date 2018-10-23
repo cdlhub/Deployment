@@ -61,14 +61,14 @@ echo "> creating Oasis environment directories..."
 # For backward compatibility and safety, we create symlink /home/centos -> /home/ubuntu
 sudo ln -s /home/${OS_NAME} /home/centos
 
-sudo -u ${OS_NAME} mkdir /home/${OS_NAME}/download
-sudo -u ${OS_NAME} mkdir /home/${OS_NAME}/upload
-sudo -u ${OS_NAME} mkdir /home/${OS_NAME}/model_data
+sudo -u ${OS_NAME} mkdir -p /home/${OS_NAME}/download
+sudo -u ${OS_NAME} mkdir -p /home/${OS_NAME}/upload
+sudo -u ${OS_NAME} mkdir -p /home/${OS_NAME}/model_data
 
 echo "> setting SQL shared directory..."
 
 apt-get install -y cifs-utils
-sudo -u ${OS_NAME} mkdir /home/${OS_NAME}/flamingo_share
+sudo -u ${OS_NAME} mkdir -p /home/${OS_NAME}/flamingo_share
 echo "username=<FLAMINGO_SHARE_USER>" > /home/${OS_NAME}/.flamingo_share_credentials
 echo "password=<FLAMINGO_SHARE_PASSWORD>" >> /home/${OS_NAME}/.flamingo_share_credentials
 chown ${OS_NAME}:${OS_NAME} /home/${OS_NAME}/.flamingo_share_credentials
