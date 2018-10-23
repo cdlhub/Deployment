@@ -81,7 +81,7 @@ echo "> installing git, and necessary repositories..."
 apt-get install -y git
 cd /home/${OS_NAME}
 sudo -u ${OS_NAME} git clone git://github.com/OasisLMF/OasisUI.git
-sudo -u ${OS_NAME} git clone git://github.com/OasisLMF/OasisApi.git
+sudo -u ${OS_NAME} git clone git://github.com/OasisLMF/OasisPlatform.git
 
 echo "> copying necessary Oasis environment files from git directories to local directories..."
 
@@ -90,7 +90,7 @@ cp -rf /home/${OS_NAME}/OasisUI/Files /home/${OS_NAME}/flamingo_share/
 echo "> copying generic yml files from git directories to local directories..."
 
 cp /home/${OS_NAME}/OasisUI/build/flamingo.yml /home/${OS_NAME}/
-cp /home/${OS_NAME}/OasisApi/build/oasisapi.yml /home/${OS_NAME}/
+cp /home/${OS_NAME}/OasisPlatform/build/oasisapi.yml /home/${OS_NAME}/
 
 echo "> installing SQL server command line tools for Linux..."
 
