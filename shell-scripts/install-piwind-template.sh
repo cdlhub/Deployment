@@ -24,7 +24,7 @@ echo "> loading model data into the Oasis environment SQL database..."
 cd /home/${OS_NAME}/OasisPiWind/flamingo/PiWind/SQLFiles
 chmod 711 load_data.py
 PATH="$PATH":/opt/mssql-tools/bin
-./load_data.py -s <SQL_IP> -n <SQL_ENV_NAME> -l <SQL_ENV_PASS> -a <KEYS_SERVICE_IP> -A <KEYS_SERVICE_PORT> -o <OASIS_API_IP> -O <OASIS_API_PORT>
+./load_data.py -s <SQL_IP> -n <SQL_ENV_NAME> -l <SQL_ENV_PASS> -a <KEYS_SERVICE_IP> -A <PIWIND_KEYS_SERVICE_PORT> -o <OASIS_API_IP> -O <OASIS_API_PORT>
 
 echo "> configuring worker files..."
 
