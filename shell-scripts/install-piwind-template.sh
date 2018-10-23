@@ -28,17 +28,19 @@ PATH="$PATH":/opt/mssql-tools/bin
 
 echo "> configuring worker files..."
 
+cp /home/${OS_NAME}/OasisApi/build/oasisworker.yml /home/${OS_NAME}/oasispiwindworker.yml
+
 cd /home/${OS_NAME}
 sed -i 's/__release_tag__/<PIWIND_RELEASE_TAG>/g' oasispiwindkeysserver.yml
 sed -i 's/__keys_service_port__/<PIWIND_KEYS_SERVICE_PORT>/g' oasispiwindkeysserver.yml
-sed -i 's/__oasis_release_tag__/<OASIS_RELEASE_TAG>/g' oasisworker.yml
-sed -i 's/__ip_address__/<IP_ADDRESS>/g' oasisworker.yml
-sed -i 's/__model_supplier__/<MODEL_SUPPLIER>/g' oasisworker.yml
-sed -i 's/__model_version__/<MODEL_VERSION>/g' oasisworker.yml
+sed -i 's/__oasis_release_tag__/<OASIS_RELEASE_TAG>/g' oasispiwindworker.yml
+sed -i 's/__ip_address__/<IP_ADDRESS>/g' oasispiwindworker.yml
+sed -i 's/__model_supplier__/<MODEL_SUPPLIER>/g' oasispiwindworker.yml
+sed -i 's/__model_version__/<MODEL_VERSION>/g' oasispiwindworker.yml
 
 echo "> starting docker containers..."
 
 docker-compose -f oasispiwindkeysserver.yml up -d
-docker-compose -f oasisworker.yml up -d
+docker-compose -f oasispiwindworker.yml up -d
 
 echo "[$(date)] END"
