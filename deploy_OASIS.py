@@ -77,11 +77,6 @@ startupscript = startupscript.replace("<FLAMINGO_RELEASE_TAG>", config['Oasis'][
 startupscript = startupscript.replace("<OASIS_API_IP>", config['FlamingoServer']['ip'])
 startupscript = startupscript.replace("<OASIS_API_PORT>", config['Oasis']['api_port'])
 startupscript = startupscript.replace("<SHINY_ENV_FILES_LOC>", config['Oasis']['shiny_files_loc'])
-# PiWind
-startupscript = startupscript.replace("<KEYS_SERVICE_IP>", config['FlamingoServer']['ip'])
-startupscript = startupscript.replace("<KEYS_SERVICE_PORT>", config['PiWind']['keys_service_port'])
-startupscript = startupscript.replace("<MODEL_SUPPLIER>", config['PiWind']['model_supplier'])
-startupscript = startupscript.replace("<MODEL_VERSION>", config['PiWind']['model_version'])
 
 # Local install
 if ( args.local ):
