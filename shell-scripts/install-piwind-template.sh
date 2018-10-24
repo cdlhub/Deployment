@@ -10,7 +10,8 @@ echo "[$(date)] BEGIN"
 echo "> cloning PiWind repository..."
 
 cd /home/${OS_NAME}
-git clone git://github.com/cdlhub/OasisPiWind.git --branch <PIWIND_RELEASE_TAG>
+git clone git://github.com/cdlhub/OasisPiWind.git 
+# --branch <PIWIND_RELEASE_TAG>
 
 echo "> copying PiWind files..."
 
