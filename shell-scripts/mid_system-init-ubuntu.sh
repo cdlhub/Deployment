@@ -80,8 +80,8 @@ echo "> installing git, and necessary repositories..."
 
 apt-get install -y git
 cd /home/${OS_NAME}
-sudo -u ${OS_NAME} git clone git://github.com/cdlhub/OasisUI.git --branch <FLAMINGO_RELEASE_TAG>
-sudo -u ${OS_NAME} git clone git://github.com/cdlhub/OasisPlatform.git --branch <OASIS_RELEASE_TAG>
+sudo -u ${OS_NAME} git clone git://github.com/OasisLMF/OasisUI.git --branch <FLAMINGO_RELEASE_TAG>
+sudo -u ${OS_NAME} git clone git://github.com/OasisLMF/OasisPlatform.git --branch <OASIS_RELEASE_TAG>
 
 echo "> copying necessary Oasis environment files from git directories to local directories..."
 
