@@ -19,6 +19,12 @@ sudo zypper install -y docker
 sudo zypper install -y cifs-utils
 ```
 
+> Note: Docker-CE is not supported on OpenSUSE. See following references for custom installation:
+> * [How can I install and run Docker CE on OpenSUSE Linux?](https://stackoverflow.com/questions/43881761/how-can-i-install-and-run-docker-ce-on-opensuse-linux).
+> * [Index of built packages](http://download.opensuse.org/repositories/Virtualization:/containers/openSUSE_Tumbleweed/x86_64/).
+> * [Installation Docker CE on openSUSE Leap 42.3](https://blog.sdmoko.net/installation-docker-ce-on-openSUSE-Leap-42-3.html).
+> * [Docker CE not supported , why ?](https://forums.opensuse.org/showthread.php/526750-Docker-CE-not-supported-why?s=cd0c10e58071c75c49424adf9daade93).
+
 ## install docker-compose 
 ```
 sudo zypper install -y docker docker-compose
