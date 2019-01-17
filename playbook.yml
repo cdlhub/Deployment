@@ -1,0 +1,111 @@
+---
+  - hosts: all
+    become: true
+
+  pre_tasks:
+
+    # Update cache
+    - name: update package cache
+      apt: update_cache=yes
+      when: ansible_os_family == "Debian"
+
+    - name: update package cache
+      yum: update_cache=yes
+      when: ansible_os_family == "RedHat"
+
+    # Upgrade system
+    - name: upgrade system
+      apt: upgrade=yes
+      when: ansible_os_family == "Debian"
+
+    - name: upgrade system
+      yum: name=* state=latest
+      when: ansible_os_family == "RedHat"
+
+  tasks:
+
+    # Uninstall Docker
+
+    # Ubuntu
+    - name: uninstall docker
+      apt: 
+        name: ['docker', 'docker-engine', 'docker.io', 'containerd', 'runc']
+        state: absent
+      when: ansible_os_family == "Debian"
+
+    # CentOS
+    - name: uninstall docker
+      yum:
+        name: ['docker', 'docker-client', 'docker-client-latest', 'docker-common', 'docker-latest', 'docker-latest-logrotate', 'docker-logrotate', 'docker-selinux', 'docker-engine-selinux', 'docker-engine']
+        state: absent
+      when: ansible_os_family == "RedHat"
+
+    # Install Docker CE
+
+    # Ubuntu
+    - name: install required packages for docker-ce
+      apt:
+        name: ['apt-transport-https', 'ca-certificates', 'curl', 'gnupg2', 'software-properties-common']
+        state: present
+      when: ansible_os_family == "Debian"
+
+    - name: add docker's official apt key
+      apt_key:
+        url: https://download.docker.com/linux/{{ ansible_distribution|lower }}/gpg
+        id: 9DC858229FC7DD38854AE2D88D81803C0EBFCD88
+        state: present
+      register: add_key
+      ignore_errors: true
+      when: ansible_os_family == "Debian"
+
+    - name: add docker apt key if failed
+      shell: "curl -sSL https://download.docker.com/linux/{{ ansible_distribution|lower }}/gpg | sudo apt-key add -"
+      args:
+        warn: no
+      when: add_key|failed  
+      when: ansible_os_family == "Debian"
+    
+    - name: add docker stable repository
+      apt_repository:
+        repo: "deb [arch=amd64] https://download.docker.com/linux/{{ ansible_distribution|lower }} {{ ansible_distribution_release }} stable"
+        state: present
+        update_cache: yes
+      when: ansible_os_family == "Debian"
+    
+    # CentOS
+    - name: install required packages for docker-ce
+      yum:
+        name: ['yum-utils', 'device-mapper-persistent-data', 'lvm2']
+        state: present
+      when: ansible_os_family == "RedHat"
+
+    - name: add docker stable repository
+      yum_repository:
+        name: docker-ce
+        description: Docker CE official repository
+        baseurl: https://download.docker.com/linux/{{ ansible_distribution|lower }}/docker-ce.repo
+      when: ansible_os_family == "RedHat"
+    
+    - name: disable docker-ce-edge
+      command: "yum-config-manager --disable docker-ce-edge"
+      when: ansible_os_family == "RedHat"
+    
+    - name: disable docker-ce-test
+      command: "yum-config-manager --disable docker-ce-test"
+      when: ansible_os_family == "RedHat"
+
+    - name: make cache
+      command: "yum makecache fast"
+      when: ansible_os_family == "RedHat"
+
+    # All OS
+    - name: install docker ce
+      package:
+        name: docker-ce
+        state: present
+    
+    - name: enable docker service at boot
+      service:
+        name: docker
+        state: started
+      enabled: yes
