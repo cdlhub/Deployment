@@ -46,19 +46,13 @@ git clone https://github.com/OasisLMF/Deployment.git
 
 # Install script dependencies  
 pip install -r requirements.txt
+```
 
-# Run the script
-./deploy_SQL.py --name          <SQL_INSTANCE_NAME> \
-                --session       <SESSION> \
-                --ami           <IMAGE_ID> \
-                --snap          <SNAPSHOT_ID> \
-                --region        eu-west-1 \
-                --key           <PRIVATE_KEY> \
-                --securitygroup <SECURITY_GROUP> \
-                --type          t2.medium \
-                --size          50 \
-                --subnet        <SUBNET_ID> \
-                --ip            <SQL_IP>
+Edit the file [config-template.ini](https://github.com/OasisLMF/Deployment/blob/master/config-template.ini)
+and save it as *conf.ini*
+
+```
+./deploy_SQL.py --config conf.ini --session <AWS-Profile-Name> --key <AWS-SSH_KeyName>
 ```
 
 ### Creating The Linux Instance
@@ -79,36 +73,10 @@ git clone https://github.com/OasisLMF/Deployment.git
 # Install script dependencies  
 pip install -r requirements.txt
 
-# Run the script
-./deploy_OASIS.py --name                <LINUX_INSTANCE_NAME> \
-                  --session             <SESSION> \
-                  --ami                 ami-f90a4880 \
-                  --region              eu-west-1 \
-                  --size                50 \
-                  --key                 <PRIVATE_KEY> \
-                  --securitygroup       <SECURITY_GROUP> \
-                  --type                t2.medium \
-                  --subnet              <SUBNET_ID> \
-                  --ip                  <LINUX_IP> \
-                  --sqlip               <SQL_IP> \
-                  --sqlsapass           Test1234 \
-                  --sqlenvname          piwind \
-                  --sqlenvpass          piwind \
-                  --sqlenvfilesloc      C:/flamingo_share/Files \
-                  --shinyenvfilesloc    /var/www/oasis/Files   \
-                  --envversion          0.392.1 \
-                  --oasisreleasetag     0.392.1 \
-                  --flamingoreleasetag  0.392.1 \
-                  --keysip              <LINUX_IP> \
-                  --keysport            9001 \
-                  --oasisapiip          <LINUX_IP>\
-                  --oasisapiport        8001 \
-                  --modelsupplier       OasisLMF \
-                  --modelversion        PiWind \
-                  --gituser             <GIT_USERNAME> \
-                  --gitpassword         <GIT_PASSWORD> \
-                  --dockeruser          <DOCKER_USERNAME> \
-                  --dockerpassword      <DOCKER_PASSWORD>
+```
+
+```
+./deploy_OASIS.py --config conf.ini --session <AWS-Profile-Name> --key <AWS-SSH_KeyName> --model piwind
 ```
 
 ### Testing the deployment
