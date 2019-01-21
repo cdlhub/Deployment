@@ -40,6 +40,9 @@ parser.add_argument('--key', action='store', dest='key_name', required=False, he
 parser.add_argument('--dryrun', action='store_true', dest='dry_run', default=False, help='flag to perform a dry run')
 parser.add_argument('--local', action='store_true', dest='local', default=False, help='run provisionning script locally')
 parser.add_argument('--osname', action='store', dest='osname', default='ubuntu', help='name of Flamingo server OS (either ubuntu, or centos)')
+parser.add_argument('--model', action='store', dest='oasis_model', default='piwind', help='name of Oasis Model to install (either ubuntu, or centos)')
+
+
 
 args = parser.parse_args()
 
@@ -59,6 +62,17 @@ with open (userdata_script, "r") as startup_file:
     startup_file_lines=startup_file.readlines()
 
 startupscript = "".join(startup_file_lines)
+
+if args.oasis_model:
+    model_script_path = "shell-scripts"
+    model_script_name = "install-{}-template.sh".format(args.oasis_model)
+    model_script = model_script_path + "/" + model_script_name
+
+    with open (model_script, "r") as model_install_file:
+        model_install_file_lines=model_install_file.readlines()
+    
+    startupscript += "".join(model_install_file_lines)
+    
 # SQL Server
 startupscript = startupscript.replace("<SQL_IP>", config['SqlServer']['ip'])
 startupscript = startupscript.replace("<SQL_PORT>", str(config['SqlServer']['sql_port']))
@@ -78,6 +92,13 @@ startupscript = startupscript.replace("<OASIS_API_IP>", config['FlamingoServer']
 startupscript = startupscript.replace("<OASIS_API_PORT>", config['Oasis']['api_port'])
 startupscript = startupscript.replace("<SHINY_ENV_FILES_LOC>", config['Oasis']['shiny_files_loc'])
 
+
+if args.oasis_model:
+    startupscript = startupscript.replace("<MODEL_KEYS_SERVICE_PORT>", config[args.oasis_model]['keys_service_port'])
+    startupscript = startupscript.replace("<MODEL_SUPPLIER>", config[args.oasis_model]['model_supplier'])
+    startupscript = startupscript.replace("<MODEL_VERSION>", config[args.oasis_model]['model_version'])
+    startupscript = startupscript.replace("<MODEL_RELEASE_TAG>", config[args.oasis_model]['release_tag'])
+
 # Local install
 if ( args.local ):
     tmp_script_name = userdata_script_path + "/" + "_" + userdata_script_name 
@@ -85,7 +106,7 @@ if ( args.local ):
         tmp_script.write(startupscript)
     os.chmod(tmp_script_name, 0o700)
 
-    subprocess.call(['sudo', tmp_script_name])
+    #subprocess.call(['sudo', tmp_script_name])
 
     os.remove(tmp_script_name)
     sys.exit(0)
