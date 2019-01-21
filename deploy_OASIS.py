@@ -94,7 +94,9 @@ startupscript = startupscript.replace("<SHINY_ENV_FILES_LOC>", config['Oasis']['
 
 
 if args.oasis_model:
+    startupscript = startupscript.replace("<KEYS_SERVICE_IP>", config['FlamingoServer']['ip'])
     startupscript = startupscript.replace("<MODEL_KEYS_SERVICE_PORT>", config[args.oasis_model]['keys_service_port'])
+    startupscript = startupscript.replace("<OASIS_SERVICE_PORT>", config[args.oasis_model]['keys_service_port'])
     startupscript = startupscript.replace("<MODEL_SUPPLIER>", config[args.oasis_model]['model_supplier'])
     startupscript = startupscript.replace("<MODEL_VERSION>", config[args.oasis_model]['model_version'])
     startupscript = startupscript.replace("<MODEL_RELEASE_TAG>", config[args.oasis_model]['release_tag'])
