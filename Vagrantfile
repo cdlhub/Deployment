@@ -11,26 +11,32 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
   # Enable SSH agent forwarding
 #   config.ssh.forward_agent = true  
 
-    
-  config.vm.define "centos" do |centos|
-    centos.vm.box = "geerlingguy/centos7"
-    centos.vm.network "private_network", ip: "192.168.0.200"
-    centos.vm.hostname = "oasis-dev-centos7"
+  # debian VM for Ansible uneder Windows
+  config.vm.define "ansible-sys", autostart: false do |ansible|
+    ansible.vm.box = "geerlingguy/debian9"
+    ansible.vm.network "private_network", ip: "192.168.0.10"
+    ansible.vm.hostname = "ansible-sys-debian"
+    ansible.vm.provider "virtualbox" do |vb|
+        vb.name = "ANSIBLE_SYS_DEBIAN"
+    end
+    ansible.vm.provision "shell", inline: "/vagrant/provision-ansible-sys.sh"
+  end
 
-    # VirtualBox configuration
-    centos.vm.provider "virtualbox" do |vb|
-        vb.name = "OASIS_CENTOS"
+  config.vm.define "ubuntu", autostart: false do |ubuntu|
+    ubuntu.vm.box = "geerlingguy/ubuntu1804"
+    ubuntu.vm.network "private_network", ip: "192.168.1.100"
+    ubuntu.vm.hostname = "oasis-dev-ubuntu18"
+    ubuntu.vm.provider "virtualbox" do |vb|
+        vb.name = "OASIS_UBUNTU"
     end
   end
 
-  config.vm.define "ubuntu" do |ubuntu|
-    ubuntu.vm.box = "geerlingguy/ubuntu1804"
-    ubuntu.vm.network "private_network", ip: "192.168.0.100"
-    ubuntu.vm.hostname = "oasis-dev-ubuntu18"
-
-    # VirtualBox configuration
-    ubuntu.vm.provider "virtualbox" do |vb|
-        vb.name = "OASIS_UBUNTU"
+  config.vm.define "centos", autostart: false do |centos|
+    centos.vm.box = "geerlingguy/centos7"
+    centos.vm.network "private_network", ip: "192.168.1.200"
+    centos.vm.hostname = "oasis-dev-centos7"
+    centos.vm.provider "virtualbox" do |vb|
+        vb.name = "OASIS_CENTOS"
     end
   end
 
@@ -41,11 +47,11 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
     vb.cpus = 2
   end
 
-  config.vm.provision "ansible" do |ansible|
-    ansible.compatibility_mode = "2.0"
-    ansible.playbook = "playbook.yml"
-    ansible.inventory_path = "staging"
-    ansible.limit = 'all'
-    ansible.raw_arguments  = "--private-key=~/.vagrant.d/insecure_private_key"
-  end
+  # config.vm.provision "ansible" do |ansible|
+  #   ansible.compatibility_mode = "2.0"
+  #   ansible.playbook = "playbook.yml"
+  #   ansible.inventory_path = "staging"
+  #   ansible.limit = 'all'
+  #   ansible.raw_arguments  = "--private-key=~/.vagrant.d/insecure_private_key"
+  # end
 end
