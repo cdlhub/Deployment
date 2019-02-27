@@ -23,7 +23,10 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
   end
 
   config.vm.define "oasis-sqlsrv", autostart: false do |win|
-    win.vm.box = "mwrock/Windows2012R2" # recommended on https://codeblog.dotsandbrackets.com/vagrant-windows/
+    # recommended on https://codeblog.dotsandbrackets.com/vagrant-windows/
+    # https://app.vagrantup.com/mwrock/boxes/Windows2012R2
+    # User: Administrator Pass: Pass@word1
+    win.vm.box = "mwrock/Windows2012R2"
     win.vm.network "private_network", ip: "192.168.1.100"
     win.vm.hostname = "oasis-dev-sql-server"
     win.vm.provider "virtualbox" do |vb|
