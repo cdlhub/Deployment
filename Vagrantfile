@@ -22,18 +22,27 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
     ansible.vm.provision "shell", inline: "/vagrant/provision-ansible-sys.sh"
   end
 
-  config.vm.define "ubuntu", autostart: false do |ubuntu|
+  config.vm.define "oasis-sqlsrv", autostart: false do |win|
+    win.vm.box = "mwrock/Windows2012R2" # recommended on https://codeblog.dotsandbrackets.com/vagrant-windows/
+    win.vm.network "private_network", ip: "192.168.1.100"
+    win.vm.hostname = "oasis-dev-sql-server"
+    win.vm.provider "virtualbox" do |vb|
+        vb.name = "OASIS_SQL_SERVER"
+    end
+  end
+
+  config.vm.define "oasis-ubuntu", autostart: false do |ubuntu|
     ubuntu.vm.box = "geerlingguy/ubuntu1804"
-    ubuntu.vm.network "private_network", ip: "192.168.1.100"
+    ubuntu.vm.network "private_network", ip: "192.168.1.200"
     ubuntu.vm.hostname = "oasis-dev-ubuntu18"
     ubuntu.vm.provider "virtualbox" do |vb|
         vb.name = "OASIS_UBUNTU"
     end
   end
 
-  config.vm.define "centos", autostart: false do |centos|
+  config.vm.define "oasis-centos", autostart: false do |centos|
     centos.vm.box = "geerlingguy/centos7"
-    centos.vm.network "private_network", ip: "192.168.1.200"
+    centos.vm.network "private_network", ip: "192.168.1.250"
     centos.vm.hostname = "oasis-dev-centos7"
     centos.vm.provider "virtualbox" do |vb|
         vb.name = "OASIS_CENTOS"
