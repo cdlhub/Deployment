@@ -1,4 +1,4 @@
-#!/bin/bash -ex
+#!/bin/bash
 
 # Variables
 OS_NAME=$(lsb_release -si | tr '[:upper:]' '[:lower:]')
