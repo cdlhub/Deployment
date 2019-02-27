@@ -39,9 +39,10 @@
         state: absent
       when: ansible_os_family == "RedHat"
 
-    # Install Docker CE. See:
-    # * https://github.com/dwdraju/ansible-install-docker
-    # * https://docs.docker.com/install/
+    # Install Docker CE
+    # See:
+    #  * https://github.com/dwdraju/ansible-install-docker
+    #  * https://docs.docker.com/install/
 
     # Ubuntu
     - name: install required packages for docker-ce [Debian]
