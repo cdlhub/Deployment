@@ -8,11 +8,6 @@ The deployment guide will detail two scenarios:
 1) Automated AWS deployment: this is a scripted deployment of the Oasis platform in AWS. This is the most strightforward way to set up the Oasis platform.
 2) Manual deployment on AWS: this is the manual process for building and deploying an Oasis platform. Again, we use an AWS environment for illustration but the steps can be used as a template for installing the Oasis platform on other environmemts. 
 
-## Prerequisites
-
-* Vagrant for testing purposes.
-* Ansible. Under Windows, yuo can start vagrant box with Ansible installed: `vagrant up ansible-sys` and run ansible command from the `/vagrant/` directory.
-
 ## Base case Oasis platform
 
 The physical set up of the base case environment is shown in the following figure:
