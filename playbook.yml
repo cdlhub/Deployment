@@ -162,19 +162,24 @@
 
     - name: create oasis directories
       file:
-        path: {{ dir_name }}
+        path: /home/{{ admin_user }}/{{ item }}
         user: {{ admin_user }}
         state: directory
       with_items:
-        - "/home/{{ admin_user }}/download"
-        - "/home/{{ admin_user }}/upload"
-        - "/home/{{ admin_user }}/model_data"
-        - "/home/{{ admin_user }}/flamingo_share"
+        - download
+        - upload
+        - model_data
+        - flamingo_share
 
+    - name: configure .flamingo_share_credentials file
+      template:
+        src: files/flamingo_share_credentials.j2
+        path: /home/{{ admin_user }}/.flamingo_share_credentials
+        owner: {{ admin_user }}
+        group: {{ admin_user }}
+        mode: 0600
+  
     - name: install cifs-utils
       package:
         name: cifs-utils
         state: present
-
-    - name: set sql shared directory
-
