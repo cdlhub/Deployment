@@ -1,3 +1,5 @@
 admin_user: {{ ansible_distribution|lower }}
+flamingo_user: flamingo
+flamingo_pass: {{ vault_falmingo_pass }}
 
 docker_compose_version: "1.23.2"
