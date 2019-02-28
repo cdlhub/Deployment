@@ -1,1 +1,3 @@
 admin_user: {{ ansible_distribution|lower }}
+
+docker_compose_version: "1.23.2"

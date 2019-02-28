@@ -134,11 +134,20 @@
       name: docker
       state: present
     
-    - name: add os user to group docker
+    - name: add admin user to group docker
       user:
         name: {{ admin_user }}
         groups: docker
         append: yes
+
+    - name: create docker-compose install directory
+      file:
+        path: /usr/local/bin/docker-compose
+        mode: "+x"
+        state: directory
+
+    - name: download docker-compose
+      shell: "curl -sSL https://github.com/docker/compose/releases/download/{{ docker_compose_version }}/docker-compose-$(uname -s)-$(uname -m) -o /usr/local/bin/docker-compose"
 
     # handlers for docker services
 
