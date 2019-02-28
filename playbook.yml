@@ -108,12 +108,7 @@
       package:
         name: docker-ce
         state: present
-    
-    - name: enable docker service at boot
-      service:
-        name: docker
-        state: started
-        enabled: yes
+      notify: restart docker-ce service
 
     - name: log docker status
       command: "docker run hello-world"
@@ -124,3 +119,19 @@
 
     - name: log docker status stderr
       debug: "{{ docker_hello_world.stderr }}"
+
+    - name: setting docker service deamon
+      lineinfile:
+        path: /lib/systemd/system/docker.service
+        regexp: '^ExecStart='
+        line: 'ExecStart=/usr/bin/dockerd -H unix:///var/run/docker.sock -D -H tcp://0.0.0.0:2375'
+      notify: restart docker-ce service
+    
+    # handlers for docker services
+
+    - name: restart docker-ce service
+      systemd:
+        name: docker
+        daemon_reload: yes
+        state: restarted
+        enabled: yes
