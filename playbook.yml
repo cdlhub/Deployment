@@ -127,6 +127,17 @@
         line: 'ExecStart=/usr/bin/dockerd -H unix:///var/run/docker.sock -D -H tcp://0.0.0.0:2375'
       notify: restart docker-ce service
     
+    - name: ensure group docker exists
+    group:
+      name: docker
+      state: present
+    
+    - name: add os user to group docker
+      user:
+        name: {{ ansible_distribution|lower }}
+        groups: docker
+        append: yes
+
     # handlers for docker services
 
     - name: restart docker-ce service
