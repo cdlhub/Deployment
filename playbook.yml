@@ -157,3 +157,24 @@
         daemon_reload: yes
         state: restarted
         enabled: yes
+
+    # OASIS Configuration
+
+    - name: create oasis directories
+      file:
+        path: {{ dir_name }}
+        user: {{ admin_user }}
+        state: directory
+      with_items:
+        - "/home/{{ admin_user }}/download"
+        - "/home/{{ admin_user }}/upload"
+        - "/home/{{ admin_user }}/model_data"
+        - "/home/{{ admin_user }}/flamingo_share"
+
+    - name: install cifs-utils
+      package:
+        name: cifs-utils
+        state: present
+
+    - name: set sql shared directory
+
