@@ -1,6 +1,8 @@
 ---
 - hosts: all
   become: true
+  vars_files:
+    - vars.yml
 
   pre_tasks:
 
@@ -134,7 +136,7 @@
     
     - name: add os user to group docker
       user:
-        name: {{ ansible_distribution|lower }}
+        name: {{ admin_user }}
         groups: docker
         append: yes
 
