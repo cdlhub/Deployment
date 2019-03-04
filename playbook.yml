@@ -303,3 +303,15 @@
         - { file: flamingo.yml, regexp: __sql_port__, replace: {{ sql_server_port }} }
         - { file: flamingo.yml, regexp: __sql_env_name__, replace: {{ sql_db_env_name }} }
         - { file: flamingo.yml, regexp: __sql_env_pass__, replace: {{ sql_db_env_pass }} }
+
+    - name: pull flamingo shiny image from dockerhub
+      docker_image:
+        name: coreoasis/flamingo_shiny
+        tag: {{ flamingo_release_tag }}
+        pull: yes
+
+    - name: runn oasis environment specific yml files to start docker containers
+      command: "docker-compose -f /home/{{ admin_user }}/{{ item }} up -d"
+      with_items:
+        - oasisapi.yml
+        - flamingo.yml
