@@ -1,7 +1,16 @@
 admin_user: {{ ansible_distribution|lower }}
+
 flamingo_user: flamingo
 flamingo_pass: flame@1234
+flamingo_share_loc: 'C:/flamingo_share/Files'
+flamingo_release_tag: 0.397.3
+
+oasis_release_tag: 0.397.8
+shiny_files_loc: /var/www/oasis/Files
 
 sql_server_ip: 192.168.1.100
+sql_sa_pass: sapas
+sql_db_env_name: dev
+sql_db_env_pass: dev
 
 docker_compose_version: "1.23.2"
