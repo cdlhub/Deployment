@@ -192,3 +192,19 @@
         opts: uid=1000,gid=1000,rw,credentials=/home/{{ admin_user }}/.flamingo_share_credentials,iocharset=utf8,dir_mode=0775,noperm,sec=ntlm
         state: mounted
         backup: yes
+
+    - name: install git
+      package:
+        name: git
+        state: present
+
+    - name: install oasis repos
+      git:
+        repo: git://github.com/OasisLMF/{{ item.repo }}
+        version: {{ item.tag }}
+        dest: /home/{{ admin_user }}
+        bare: yes
+        forece: yes
+      with_items:
+        - { repo: OasisUI.git, tag: flamingo_release_tag }
+        - { repo: OasisPlatform.git, tag: oasis_release_tag }
