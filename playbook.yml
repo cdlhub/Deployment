@@ -280,8 +280,11 @@
 
     - name: copy generic yml files
       copy:
-        src: {{ item.repo}}/{{ item.file }}
+        src: /home/{{ admin_user }}/{{ item.repo }}/build/{{ item.file }}
         remote_src: yes
         dest: /home/{{ admin_user }}
         owner: {{ admin_user }}
         group: {{ admin_user }}
+      with_items:
+        - { repo: OasisUI, file: flamingo.yml }
+        - { repo: OasisPlatform, file: oasisapi.yml }
