@@ -310,6 +310,8 @@
         tag: {{ flamingo_release_tag }}
         pull: yes
 
+    # TODO: replace docker-compose by ansible
+    # SEE: https://www.ansible.com/blog/six-ways-ansible-makes-docker-compose-better
     - name: runn oasis environment specific yml files to start docker containers
       command: "docker-compose -f /home/{{ admin_user }}/{{ item }} up -d"
       with_items:
