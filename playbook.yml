@@ -286,5 +286,20 @@
         owner: {{ admin_user }}
         group: {{ admin_user }}
       with_items:
-        - { repo: OasisUI, file: flamingo.yml }
         - { repo: OasisPlatform, file: oasisapi.yml }
+        - { repo: OasisUI, file: flamingo.yml }
+
+    - name: update yml files to spacific oasis environment
+      replace:
+        path: /home/{{ admin_user }}/{{ item.file }}
+        regexp: "{{ item.regexp }}"
+        replace: "{{ item.replace }}"
+        backup: yes
+      with_items:
+        - { file: oasisapi.yml, regexp: __oasis_release_tag__, replace: {{ oasis_release_tag }} }
+        - { file: flamingo.yml, regexp: __ip_address__, replace: {{ flamingo_server_ip }} }
+        - { file: flamingo.yml, regexp: __flamingo_release_tag__, replace: {{ flamingo_release_tag }} }
+        - { file: flamingo.yml, regexp: __sql_ip__, replace: {{ sql_server_ip }} }
+        - { file: flamingo.yml, regexp: __sql_port__, replace: {{ sql_server_port }} }
+        - { file: flamingo.yml, regexp: __sql_env_name__, replace: {{ sql_db_env_name }} }
+        - { file: flamingo.yml, regexp: __sql_env_pass__, replace: {{ sql_db_env_pass }} }
