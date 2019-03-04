@@ -158,6 +158,69 @@
         state: restarted
         enabled: yes
 
+    # Install MSSQL tools
+
+    - name: install required packages for mssql
+      package:
+        name: curl
+        state: present
+
+    # Debian
+    - name: import the public repository gpg keys [Debian]
+      shell: "curl https://packages.microsoft.com/keys/microsoft.asc | sudo apt-key add -"
+      args:
+        warn: no
+      when: ansible_os_family == "Debian"
+
+    - name: register the microsoft repository [Debian]
+      shell: "curl https://packages.microsoft.com/config/{{ ansible_distribution|lower }}/{{ ansible_distribution_release }}/prod.list | sudo tee /etc/apt/sources.list.d/msprod.list"
+      when: ansible_os_family == "Debian"
+
+    - name: install mssql tools [Debian]
+      apt:
+        name: ['mssql-tools', 'unixodbc-dev']
+        update_cache: yes
+        state: present
+      environment:
+        ACCEPT_EULA: 1
+      when: ansible_os_family == "Debian"
+
+    # CentOS
+    - name: register the microsoft repository [CentOS]
+      shell: "curl https://packages.microsoft.com/config/{{ ansible_distribution|lower }}/{{ ansible_distribution_release }}/prod.repo > /etc/yum.repos.d/msprod.repo"
+      when: ansible_os_family == "RedHat"
+
+    - name: remove old mssql packages [CentOS]
+      yum:
+        name: ['mssql-tools', 'unixODBC-utf16-devel']
+        state: absent
+      when: ansible_os_family == "RedHat"
+
+    - name: install mssql tools [CentOS]
+      yum:
+        name: ['mssql-tools', 'unixODBC-devel']
+        update_cache: yes
+        state: present
+      environment:
+        ACCEPT_EULA: 1
+      when: ansible_os_family == "RedHat"
+
+    # All OS
+    - name: add /opt/mssql-tools/bin/ to PATH environment variable
+      lineinfile:
+        path: /home/{{ admin_user }}/{{ item }}
+        line: 'export PATH="$PATH:/opt/mssql-tools/bin"'
+        insertafter: EOF
+        state: present
+      with_items:
+        - .bash_profile
+        - .bashrc
+
+    - name: export PATH environment variable
+      shell: "source /home/{{ admin_user }}/.bashrc"
+      args:
+        executable: /bin/bash
+
     # OASIS Configuration
 
     - name: create oasis directories
@@ -208,3 +271,14 @@
       with_items:
         - { repo: OasisUI.git, tag: flamingo_release_tag }
         - { repo: OasisPlatform.git, tag: oasis_release_tag }
+
+    - name: copy oasis environment files
+      command: "cp -rf /home/{{ admin_user }}/OasisUI/Files /home/{{ admin_user }}/flamingo_share/"
+
+    - name: copy generic yml files
+      copy:
+        src: {{ item.repo}}/{{ item.file }}
+        remote_src: yes
+        dest: /home/{{ admin_user }}
+        owner: {{ admin_user }}
+        group: {{ admin_user }}
