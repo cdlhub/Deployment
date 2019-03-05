@@ -41,7 +41,14 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
     ubuntu.vm.provider "virtualbox" do |vb|
         vb.name = "OASIS_UBUNTU"
     end
-  end
+    ubuntu.vm.provision "ansible" do |ansible|
+      ansible.compatibility_mode = "2.0"
+      ansible.playbook = "playbook.yml"
+      ansible.inventory_path = "staging"
+      ansible.limit = 'all'
+      ansible.raw_arguments  = "--private-key=~/.vagrant.d/insecure_private_key"
+    end
+end
 
   config.vm.define "oasis-centos", autostart: false do |centos|
     centos.vm.box = "geerlingguy/centos7"
