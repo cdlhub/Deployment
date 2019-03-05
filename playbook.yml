@@ -154,14 +154,21 @@
         groups: docker
         append: yes
 
-    - name: create docker-compose install directory
+    # - name: create docker-compose install directory
+    #   file:
+    #     path: /usr/local/bin/docker-compose
+    #     mode: "+x"
+    #     state: directory
+
+    - name: download docker-compose
+      shell: "curl -L https://github.com/docker/compose/releases/download/{{ docker_compose_version }}/docker-compose-`uname -s`-`uname -m` -o /usr/local/bin/docker-compose"
+      args:
+        warn: no
+
+    - name: set docker-compose executable mode
       file:
         path: /usr/local/bin/docker-compose
         mode: "+x"
-        state: directory
-
-    - name: download docker-compose
-      shell: "curl -sSL https://github.com/docker/compose/releases/download/{{ docker_compose_version }}/docker-compose-$(uname -s)-$(uname -m) -o /usr/local/bin/docker-compose"
 
     # Install MSSQL tools
 
@@ -178,8 +185,14 @@
       when: ansible_os_family == "Debian"
 
     - name: register the microsoft repository [Debian]
-      shell: "curl https://packages.microsoft.com/config/{{ ansible_distribution|lower }}/{{ ansible_distribution_release }}/prod.list | sudo tee /etc/apt/sources.list.d/msprod.list"
+      shell: "curl https://packages.microsoft.com/config/{{ ansible_distribution|lower }}/{{ ansible_distribution_version }}/prod.list | sudo tee /etc/apt/sources.list.d/msprod.list"
+      args:
+        warn: no
       when: ansible_os_family == "Debian"
+
+    - name: update repository cache
+      package: 
+        update_cache: yes
 
     - name: install mssql tools [Debian]
       apt:
@@ -187,13 +200,17 @@
         update_cache: yes
         state: present
       environment:
-        ACCEPT_EULA: 1
+        ACCEPT_EULA: "Y"
       when: ansible_os_family == "Debian"
 
     # CentOS
     - name: register the microsoft repository [CentOS]
-      shell: "curl https://packages.microsoft.com/config/{{ ansible_distribution|lower }}/{{ ansible_distribution_release }}/prod.repo > /etc/yum.repos.d/msprod.repo"
+      shell: "curl https://packages.microsoft.com/config/{{ ansible_distribution|lower }}/{{ ansible_distribution_version }}/prod.repo > /etc/yum.repos.d/msprod.repo"
       when: ansible_os_family == "RedHat"
+
+    - name: update repository cache
+      package: 
+        update_cache: yes
 
     - name: remove old mssql packages [CentOS]
       yum:
@@ -207,7 +224,7 @@
         update_cache: yes
         state: present
       environment:
-        ACCEPT_EULA: 1
+        ACCEPT_EULA: "Y"
       when: ansible_os_family == "RedHat"
 
     # All OS
@@ -216,7 +233,10 @@
         path: "/home/{{ admin_user }}/{{ item }}"
         line: 'export PATH="$PATH:/opt/mssql-tools/bin"'
         insertafter: EOF
+        owner: "{{ admin_user }}"
+        group: "{{ admin_user }}"
         state: present
+        create: yes
       with_items:
         - .bash_profile
         - .bashrc
@@ -231,7 +251,8 @@
     - name: create oasis directories
       file:
         path: "/home/{{ admin_user }}/{{ item }}"
-        user: "{{ admin_user }}"
+        owner: "{{ admin_user }}"
+        group: "{{ admin_user }}"
         state: directory
       with_items:
         - download
