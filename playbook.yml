@@ -130,9 +130,9 @@
       notify: restart docker-ce service
     
     - name: ensure group docker exists
-    group:
-      name: docker
-      state: present
+      group:
+        name: docker
+        state: present
     
     - name: add admin user to group docker
       user:
@@ -208,7 +208,7 @@
     # All OS
     - name: add /opt/mssql-tools/bin/ to PATH environment variable
       lineinfile:
-        path: /home/{{ admin_user }}/{{ item }}
+        path: "/home/{{ admin_user }}/{{ item }}"
         line: 'export PATH="$PATH:/opt/mssql-tools/bin"'
         insertafter: EOF
         state: present
@@ -225,8 +225,8 @@
 
     - name: create oasis directories
       file:
-        path: /home/{{ admin_user }}/{{ item }}
-        user: {{ admin_user }}
+        path: "/home/{{ admin_user }}/{{ item }}"
+        user: "{{ admin_user }}"
         state: directory
       with_items:
         - download
@@ -237,9 +237,9 @@
     - name: configure .flamingo_share_credentials file
       template:
         src: files/flamingo_share_credentials.j2
-        path: /home/{{ admin_user }}/.flamingo_share_credentials
-        owner: {{ admin_user }}
-        group: {{ admin_user }}
+        path: "/home/{{ admin_user }}/.flamingo_share_credentials"
+        owner: "{{ admin_user }}"
+        group: "{{ admin_user }}"
         mode: 0600
   
     - name: install cifs-utils
@@ -249,10 +249,10 @@
 
     - name: mount flamingo share
       mount:
-        src: //{{ sql_server_ip }}/flamingo_share
-        path: /home/{{ admin_user }}/flamingo_share
+        src: "//{{ sql_server_ip }}/flamingo_share"
+        path: "/home/{{ admin_user }}/flamingo_share"
         fstype: cifs
-        opts: uid=1000,gid=1000,rw,credentials=/home/{{ admin_user }}/.flamingo_share_credentials,iocharset=utf8,dir_mode=0775,noperm,sec=ntlm
+        opts: "uid=1000,gid=1000,rw,credentials=/home/{{ admin_user }}/.flamingo_share_credentials,iocharset=utf8,dir_mode=0775,noperm,sec=ntlm"
         state: mounted
         backup: yes
 
@@ -263,14 +263,14 @@
 
     - name: install oasis repos
       git:
-        repo: git://github.com/OasisLMF/{{ item.repo }}
-        version: {{ item.tag }}
-        dest: /home/{{ admin_user }}
+        repo: "git://github.com/OasisLMF/{{ item.repo }}"
+        version: "{{ item.tag }}"
+        dest: "/home/{{ admin_user }}"
         bare: yes
-        forece: yes
+        force: yes
       with_items:
-        - { repo: OasisUI.git, tag: {{ flamingo_release_tag }} }
-        - { repo: OasisPlatform.git, tag: {{ oasis_release_tag }} }
+        - { repo: OasisUI.git, tag: "{{ flamingo_release_tag }}" }
+        - { repo: OasisPlatform.git, tag: "{{ oasis_release_tag }}" }
 
     - name: copy oasis environment files
       command: "cp -rf /home/{{ admin_user }}/OasisUI/Files /home/{{ admin_user }}/flamingo_share/"
@@ -280,34 +280,34 @@
 
     - name: copy generic yml files
       copy:
-        src: /home/{{ admin_user }}/{{ item.repo }}/build/{{ item.file }}
+        src: "/home/{{ admin_user }}/{{ item.repo }}/build/{{ item.file }}"
         remote_src: yes
-        dest: /home/{{ admin_user }}
-        owner: {{ admin_user }}
-        group: {{ admin_user }}
+        dest: "/home/{{ admin_user }}"
+        owner: "{{ admin_user }}"
+        group: "{{ admin_user }}"
       with_items:
         - { repo: OasisPlatform, file: oasisapi.yml }
         - { repo: OasisUI, file: flamingo.yml }
 
     - name: update yml files to spacific oasis environment
       replace:
-        path: /home/{{ admin_user }}/{{ item.file }}
+        path: "/home/{{ admin_user }}/{{ item.file }}"
         regexp: "{{ item.regexp }}"
         replace: "{{ item.replace }}"
         backup: yes
       with_items:
-        - { file: oasisapi.yml, regexp: __oasis_release_tag__, replace: {{ oasis_release_tag }} }
-        - { file: flamingo.yml, regexp: __ip_address__, replace: {{ flamingo_server_ip }} }
-        - { file: flamingo.yml, regexp: __flamingo_release_tag__, replace: {{ flamingo_release_tag }} }
-        - { file: flamingo.yml, regexp: __sql_ip__, replace: {{ sql_server_ip }} }
-        - { file: flamingo.yml, regexp: __sql_port__, replace: {{ sql_server_port }} }
-        - { file: flamingo.yml, regexp: __sql_env_name__, replace: {{ sql_db_env_name }} }
-        - { file: flamingo.yml, regexp: __sql_env_pass__, replace: {{ sql_db_env_pass }} }
+        - { file: oasisapi.yml, regexp: __oasis_release_tag__, replace: "{{ oasis_release_tag }}" }
+        - { file: flamingo.yml, regexp: __ip_address__, replace: "{{ flamingo_server_ip }}" }
+        - { file: flamingo.yml, regexp: __flamingo_release_tag__, replace: "{{ flamingo_release_tag }}" }
+        - { file: flamingo.yml, regexp: __sql_ip__, replace: "{{ sql_server_ip }}" }
+        - { file: flamingo.yml, regexp: __sql_port__, replace: "{{ sql_server_port }}" }
+        - { file: flamingo.yml, regexp: __sql_env_name__, replace: "{{ sql_db_env_name }}" }
+        - { file: flamingo.yml, regexp: __sql_env_pass__, replace: "{{ sql_db_env_pass }}" }
 
     - name: pull flamingo shiny image from dockerhub
       docker_image:
         name: coreoasis/flamingo_shiny
-        tag: {{ flamingo_release_tag }}
+        tag: "{{ flamingo_release_tag }}"
         pull: yes
 
     # TODO: replace docker-compose by ansible
