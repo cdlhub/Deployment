@@ -18,10 +18,10 @@
         update_cache: yes
 
     # Upgrade system
-    - name: upgrade system
-      package: 
-        name: "*"
-        state: latest
+    # - name: upgrade system
+    #   package: 
+    #     name: "*"
+    #     state: latest
 
   tasks:
 
