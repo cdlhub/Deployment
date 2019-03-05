@@ -55,7 +55,7 @@
 
     - name: add docker's official apt key [Debian]
       apt_key:
-        url: https://download.docker.com/linux/{{ ansible_distribution|lower }}/gpg
+        url: "https://download.docker.com/linux/{{ ansible_distribution|lower }}/gpg"
         id: 9DC858229FC7DD38854AE2D88D81803C0EBFCD88
         state: present
       register: add_key
@@ -86,7 +86,7 @@
       yum_repository:
         name: docker-ce
         description: Docker CE official repository
-        baseurl: https://download.docker.com/linux/{{ ansible_distribution|lower }}/$releasever/$basearch/
+        baseurl: "https://download.docker.com/linux/{{ ansible_distribution|lower }}/$releasever/$basearch/"
       when: ansible_os_family == "RedHat"
     
     - name: disable docker-ce-edge [RedHat]
@@ -136,7 +136,7 @@
     
     - name: add admin user to group docker
       user:
-        name: {{ admin_user }}
+        name: "{{ admin_user }}"
         groups: docker
         append: yes
 
