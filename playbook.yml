@@ -112,6 +112,13 @@
         state: present
       notify: restart docker-ce service
 
+    - name: restart docker-ce service
+      systemd:
+        name: docker
+        daemon_reload: yes
+        state: restarted
+        enabled: yes
+
     - name: log docker status
       command: "docker run hello-world"
       register: docker_hello_world
@@ -129,6 +136,13 @@
         line: 'ExecStart=/usr/bin/dockerd -H unix:///var/run/docker.sock -D -H tcp://0.0.0.0:2375'
       notify: restart docker-ce service
     
+    - name: restart docker-ce service
+      systemd:
+        name: docker
+        daemon_reload: yes
+        state: restarted
+        enabled: yes
+
     - name: ensure group docker exists
       group:
         name: docker
@@ -148,15 +162,6 @@
 
     - name: download docker-compose
       shell: "curl -sSL https://github.com/docker/compose/releases/download/{{ docker_compose_version }}/docker-compose-$(uname -s)-$(uname -m) -o /usr/local/bin/docker-compose"
-
-    # handlers for docker services
-
-    - name: restart docker-ce service
-      systemd:
-        name: docker
-        daemon_reload: yes
-        state: restarted
-        enabled: yes
 
     # Install MSSQL tools
 
@@ -317,3 +322,12 @@
       with_items:
         - oasisapi.yml
         - flamingo.yml
+
+  handlers:
+
+    - name: restart docker-ce service
+      systemd:
+        name: docker
+        daemon_reload: yes
+        state: restarted
+        enabled: yes
