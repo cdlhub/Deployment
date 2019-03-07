@@ -289,14 +289,13 @@
 
     - name: install oasis repos
       git:
-        repo: "git://github.com/OasisLMF/{{ item.repo }}"
+        repo: "git://github.com/OasisLMF/{{ item.repo }}.git"
         version: "{{ item.tag }}"
-        dest: "/home/{{ admin_user }}"
-        bare: yes
+        dest: "/home/{{ admin_user }}/{{ item.repo }}"
         force: yes
       with_items:
-        - { repo: OasisUI.git, tag: "{{ flamingo_release_tag }}" }
-        - { repo: OasisPlatform.git, tag: "{{ oasis_release_tag }}" }
+        - { repo: OasisUI, tag: "{{ flamingo_release_tag }}" }
+        - { repo: OasisPlatform, tag: "{{ oasis_release_tag }}" }
 
     - name: copy oasis environment files
       command: "cp -rf /home/{{ admin_user }}/OasisUI/Files /home/{{ admin_user }}/flamingo_share/"
