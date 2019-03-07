@@ -263,7 +263,7 @@
     - name: configure .flamingo_share_credentials file
       template:
         src: files/flamingo_share_credentials.j2
-        path: "/home/{{ admin_user }}/.flamingo_share_credentials"
+        dest: "/home/{{ admin_user }}/.flamingo_share_credentials"
         owner: "{{ admin_user }}"
         group: "{{ admin_user }}"
         mode: 0600
@@ -278,7 +278,7 @@
         src: "//{{ sql_server_ip }}/flamingo_share"
         path: "/home/{{ admin_user }}/flamingo_share"
         fstype: cifs
-        opts: "uid=1000,gid=1000,rw,credentials=/home/{{ admin_user }}/.flamingo_share_credentials,iocharset=utf8,dir_mode=0775,noperm,sec=ntlm"
+        opts: "uid=1000,gid=1000,rw,credentials=/home/{{ admin_user }}/.flamingo_share_credentials,iocharset=utf8,dir_mode=0775,noperm"
         state: mounted
         backup: yes
 
