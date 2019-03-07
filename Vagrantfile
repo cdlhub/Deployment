@@ -28,6 +28,8 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
     # User: Administrator Pass: Pass@word1
     win.vm.box = "mwrock/Windows2012R2"
     win.vm.network "private_network", ip: "192.168.1.100"
+    # win.vm.network "forwarded_port", guest: 22, host: 2222, : "ssh", disabled: true
+    win.vm.network "forwarded_port", guest: 22, host: 2210, id:"ssh", protocol: "tcp"
     win.vm.hostname = "oasis-dev-sql-server"
     win.vm.provider "virtualbox" do |vb|
         vb.name = "OASIS_SQL_SERVER"
@@ -37,6 +39,7 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
   config.vm.define "oasis-ubuntu", autostart: false do |ubuntu|
     ubuntu.vm.box = "geerlingguy/ubuntu1804"
     ubuntu.vm.network "private_network", ip: "192.168.1.200"
+    ubuntu.vm.network "forwarded_port", guest: 22, host: 2220, id:"ssh", protocol: "tcp"
     ubuntu.vm.hostname = "oasis-dev-ubuntu18"
     ubuntu.vm.provider "virtualbox" do |vb|
         vb.name = "OASIS_UBUNTU"
@@ -53,6 +56,7 @@ end
   config.vm.define "oasis-centos", autostart: false do |centos|
     centos.vm.box = "geerlingguy/centos7"
     centos.vm.network "private_network", ip: "192.168.1.250"
+    centos.vm.network "forwarded_port", guest: 22, host: 2225, id:"ssh", protocol: "tcp"
     centos.vm.hostname = "oasis-dev-centos7"
     centos.vm.provider "virtualbox" do |vb|
         vb.name = "OASIS_CENTOS"
