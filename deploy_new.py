@@ -18,7 +18,7 @@ def parse_arguments():
         default=False, help=dryrun_help)
     key_help = "AWS access key file name to access the instance"
     parser.add_argument("--key", action="store", dest="key_name",
-        required=False, help=key_help)j
+        required=False, help=key_help)
     osname_help = "name of Flamingo server OS (default: ubuntu)"
     parser.add_argument("--osname", action="store", dest="osname",
         default="ubuntu", help=osname_help)
@@ -51,7 +51,7 @@ if __name__ == "__main__":
 
     # Create AWS instance
     session = boto3.Session(profile_name=args.session_profile)
-    ec2 = session.resource("ex2",
+    ec2 = session.resource("ec2",
         region_name=config['FlamingoServer']['region'])
 
     instance = ec2.create_instances(
@@ -74,7 +74,7 @@ if __name__ == "__main__":
 
                 },
             },
-        },
+        ],
         SubnetId=config['FlamingoServer']['subnet'],
         PrivateIpAddress=config['FlamingoServer']['ip'],
         TagSpecifications=[
