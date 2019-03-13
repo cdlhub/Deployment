@@ -4,6 +4,8 @@
 import argparse
 import boto3
 import configparser
+import subprocess
+import sys
 
 def parse_arguments():
 
@@ -19,6 +21,9 @@ def parse_arguments():
     key_help = "AWS access key file name to access the instance"
     parser.add_argument("--key", action="store", dest="key_name",
         required=False, help=key_help)
+    local_help = "run provisioning script locally"
+    parser.add_argument("--local", action="store_true", dest="local",
+        default=False, help=local_help)
     osname_help = "name of Flamingo server OS (default: ubuntu)"
     parser.add_argument("--osname", action="store", dest="osname",
         default="ubuntu", help=osname_help)
@@ -41,13 +46,19 @@ if __name__ == "__main__":
     config.read(args.config)
 
     # Determine and read in startup shell script to be injected and executed
-    # during creation of instance
+    # during creation of instance or executed locally
     os_name = args.osname.lower()
     userdata_script_path = "shell-scripts"
     userdata_script_name = "mid_system-init-" + os_name + ".sh"
     userdata_script = userdata_script_path + "/" + userdata_script_name
-    with open(userdata_script, "r") as startup_file:
-        startupscript = startup_file.read()
+    # If local flag given execute startup shell script locally and exit
+    if args.local:
+        subprocess.call(['sudo', userdata_script])
+        sys.exit(0)
+    # If AWS instance to be created read in startup shell script
+    else:
+        with open(userdata_script, "r") as startup_file:
+            startupscript = startup_file.read()
 
     # Create AWS instance
     session = boto3.Session(profile_name=args.session_profile)
