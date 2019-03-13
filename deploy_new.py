@@ -12,24 +12,28 @@ def parse_arguments():
     description = "Provision Flamingo server and docker containers."
     parser = argparse.ArgumentParser(description=description)
 
+    # Optional arguments
     config_help = "set INI configuration file name (default: config.ini)"
     parser.add_argument("--config", action="store", dest="config",
         default="config.ini", help=config_help)
     dryrun_help = "flag to perform a dry run"
     parser.add_argument("--dryrun", action="store_true", dest="dry_run",
         default=False, help=dryrun_help)
-    key_help = "AWS access key file name to access the instance"
-    parser.add_argument("--key", action="store", dest="key_name",
-        required=False, help=key_help)
-    local_help = "run provisioning script locally"
-    parser.add_argument("--local", action="store_true", dest="local",
-        default=False, help=local_help)
     osname_help = "name of Flamingo server OS (default: ubuntu)"
     parser.add_argument("--osname", action="store", dest="osname",
         default="ubuntu", help=osname_help)
     session_help = "AWS profile to get credentials"
     parser.add_argument("--session", action="store", dest="session_profile",
         default="default", required=False, help=session_help)
+
+    # Require either AWS access key file name or local flag to be specified
+    key_or_local_group = parser.add_mutually_exclusive_group(required=True)
+    key_help = "AWS access key file name to access the instance"
+    key_or_local_group.add_argument("--key", action="store", dest="key_name",
+        required=False, help=key_help)
+    local_help = "run provisioning script locally"
+    key_or_local_group.add_argument("--local", action="store_true",
+        dest="local", default=False, help=local_help)
 
     args = parser.parse_args()
 
