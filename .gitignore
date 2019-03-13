@@ -110,4 +110,4 @@ ENV/
 config.ini
 
 # AWS access key file name
-.pem
+*.pem
