@@ -89,42 +89,42 @@ if __name__ == "__main__":
     # Create AWS instance
     session = boto3.Session(profile_name=args.session_profile)
     ec2 = session.resource("ec2",
-        region_name=config['FlamingoServer']['region'])
+        region_name=config['OasisServer']['region'])
 
     instance = ec2.create_instances(
         DryRun=args.dry_run,
-        ImageId=config['FlamingoServer']['ami'],
+        ImageId=config['OasisServer']['ami'],
         MinCount=1,
         MaxCount=1,
         KeyName=args.key_name,
         SecurityGroupIds=[
-            config['FlamingoServer']['security_group'],
+            config['OasisServer']['security_group'],
         ],
         UserData=startupscript,
-        InstanceType=config['FlamingoServer']['instance_type'],
+        InstanceType=config['OasisServer']['instance_type'],
         BlockDeviceMappings=[
             {
                 'DeviceName': '/dev/sda1',
                 'Ebs': {
-                    'VolumeSize': int(config['FlamingoServer']['volume_size']),
-                    'VolumeType': config['FlamingoServer']['volume_type'],
+                    'VolumeSize': int(config['OasisServer']['volume_size']),
+                    'VolumeType': config['OasisServer']['volume_type'],
 
                 },
             },
         ],
-        SubnetId=config['FlamingoServer']['subnet'],
-        PrivateIpAddress=config['FlamingoServer']['ip'],
+        SubnetId=config['OasisServer']['subnet'],
+        PrivateIpAddress=config['OasisServer']['ip'],
         TagSpecifications=[
             {
                 'ResourceType': 'instance',
                 'Tags': [
                     {
                         'Key': 'Name',
-                        'Value': config['FlamingoServer']['name']
+                        'Value': config['OasisServer']['name']
                     },
                     {
                         'Key': 'Schedule',
-                        'Value': config['FlamingoServer']['schedule']
+                        'Value': config['OasisServer']['schedule']
                     },
                 ]
             },
