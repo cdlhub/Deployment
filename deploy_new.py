@@ -1,6 +1,18 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
+"""
+This script can be used to create an AWS EC2 instance to hold the Flamingo
+server. It calls a startup shell script that deploys the Oasis Platform API
+with an example PiWind model. Local deployment is possible with the local flag.
+
+Example 1: Deploy on AWS:
+python deploy_OASIS.py --config config.ini --key <AWS-SSH-KeyName>
+
+Example 2: Deploy on local machine:
+python deploy_OASIS.py --local
+"""
+
 import argparse
 import boto3
 import configparser
@@ -8,6 +20,16 @@ import subprocess
 import sys
 
 def parse_arguments():
+    """parse_arguments()
+    Parses command line arguments. Requires either --key AWS-SSH-KeyName or
+    --local arguments.
+    Optional arguments are:
+        --config AWS-CONFIGURATION-FILE (default: config.ini)
+        --dryrun (default: False)
+        --osname OS-NAME (default: ubuntu)
+        --session AWS-PROFILE-NAME (default: default)
+    Returns parsed arguments
+    """
 
     description = "Provision Flamingo server and docker containers."
     parser = argparse.ArgumentParser(description=description)
