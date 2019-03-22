@@ -111,3 +111,9 @@ config.ini
 
 # AWS access key file name
 *.pem
+
+# Vagrant
+.vagrant
+
+# Ansible
+*.retry
