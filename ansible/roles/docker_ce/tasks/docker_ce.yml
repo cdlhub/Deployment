@@ -1,0 +1,48 @@
+- name: uninstall docker modules
+  pip:
+    name: ['docker', 'docker-py', 'docker-compose']
+    state: absent
+
+- name: install docker ce
+  package:
+    name: ['docker-ce', 'docker-ce-cli', 'containerd.io']
+    state: present
+
+- name: install docker-compose
+  pip:
+    name: docker-compose
+    state: present
+
+- name: setting docker service deamon
+  lineinfile:
+    path: /lib/systemd/system/docker.service
+    regexp: '^ExecStart='
+    line: 'ExecStart=/usr/bin/dockerd -H unix:///var/run/docker.sock -D -H tcp://0.0.0.0:2375'
+
+- name: restart docker-ce service
+  systemd:
+    name: docker
+    daemon_reload: yes
+    state: restarted
+    enabled: yes
+
+- name: docker run hello-world
+  docker_container:
+    name: hello_world
+    image: hello-world
+  register: docker_hello_world
+
+# - name: log hello-world container
+#   debug: 
+#     msg: "{{ docker_hello_world }}"
+
+- name: ensure group docker exists
+  group:
+    name: docker
+    state: present
+
+- name: add admin user to group docker
+  user:
+    name: "{{ ansible_distribution|lower }}"
+    groups: docker
+    append: yes

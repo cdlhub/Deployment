@@ -1,0 +1,13 @@
+---
+- hosts: all
+  become: true
+
+  roles:
+    - pip
+    - docker_ce
+    - oasis_eval
+
+  pre_tasks:
+    - name: update cache
+      package:
+        update_cache: yes

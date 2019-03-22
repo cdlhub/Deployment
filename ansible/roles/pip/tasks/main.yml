@@ -1,0 +1,17 @@
+- name: install pip [debian family]
+  import_tasks: debian.yml
+  when: ansible_facts['os_family']|lower == 'debian'
+
+- name: install pip [redhat family]
+  import_tasks: redhat.yml
+  when: ansible_facts['os_family']|lower == 'redhat'
+
+- name: upgrade pip
+  command: "pip install --upgrade pip"
+
+- name: install setuptools with pip
+  pip:
+    name: setuptools
+    state: present
+    extra_args: -U
+

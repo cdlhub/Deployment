@@ -1,0 +1,32 @@
+- name: install python [debian family]
+  raw: |
+    family=$(cat /etc/os-release | grep ID_LIKE | cut -d= -f2);
+    if [ "$family" == "debian" ]; then
+      test -e /usr/bin/python || (apt -y update && apt install -y python-minimal)
+    fi
+  args:
+    executable: /bin/bash
+
+- name: install python [redhat family]
+  raw: |
+    family=$(cat /etc/os-release | grep ID_LIKE | cut -d= -f2);
+    if [ "$family" == "rhel fedora" ]; then
+      test -e /usr/bin/python || (yum -y update && yum install -y python-minimal)
+    fi
+  args:
+    executable: /bin/bash
+
+- name: gathering facts
+  setup:
+
+- name: install aptitude [debian family]
+  apt:
+    name: aptitude
+    state: present
+  when: ansible_facts['os_family']|lower == 'debian'
+
+- name: upgrade all packages to latest version
+  package:
+    name: "*"
+    state: latest
+    update_cache: yes

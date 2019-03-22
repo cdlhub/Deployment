@@ -1,0 +1,4 @@
+# Ansible host file for testing
+
+[dev]
+192.168.2.190 ansible_user=ubuntu

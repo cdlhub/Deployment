@@ -1,0 +1,15 @@
+- name: install epel
+  yum:
+    name: epel-release
+    state: present
+    disable_gpg_check: True
+
+- name: install pip
+  yum:
+    name: ['python-pip', 'python-devel']
+    state: present
+
+- name: install development tools
+  yum:
+    name: '@Development Tools'
+    state: present

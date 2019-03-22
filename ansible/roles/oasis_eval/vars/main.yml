@@ -1,0 +1,35 @@
+admin_user: "{{ ansible_distribution|lower }}"
+
+version: "1.0.1"
+git_user: "OasisLMF"
+docker_user: "coreoasis"
+
+git_user_ui: "{{ git_user }}"
+git_repo_ui: OasisUI
+git_version_ui: "{{ version }}"
+
+git_user_api: "{{ git_user }}"
+git_repo_api: OasisPlatform
+git_version_api: "{{ version }}"
+
+git_user_piwind: "{{ git_user }}"
+git_repo_piwind: OasisPiWind
+git_version_piwind: "{{ version }}"
+
+docker_network: "shiny-net"
+
+docker_usr_api_server: "{{ docker_user }}"
+docker_img_api_server: "api_server"
+docker_tag_api_server: "{{ version }}"
+
+docker_usr_model_worker: "{{ docker_user }}"
+docker_img_model_worker: "model_worker"
+docker_tag_model_worker: "{{ version }}"
+
+docker_usr_oasisui_app: "{{ docker_user }}"
+docker_img_oasisui_app: "oasisui_app"
+docker_tag_oasisui_app: "{{ version }}"
+
+docker_usr_oasisui_proxy: "{{ docker_user }}"
+docker_img_oasisui_proxy: "oasisui_proxy"
+docker_tag_oasisui_proxy: "{{ version }}"

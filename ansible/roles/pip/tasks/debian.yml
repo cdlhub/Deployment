@@ -1,0 +1,9 @@
+- name: install pip
+  apt:
+    name: ['python-pip', 'python-dev']
+    state: present
+
+- name: install development tools
+  apt:
+    name: build-essential
+    state: present

@@ -1,0 +1,27 @@
+- name: uninstall docker [redhat family]
+  yum:
+    name: ['docker', 'docker-client', 'docker-client-latest', 'docker-common', 'docker-latest', 'docker-latest-logrotate', 'docker-logrotate', 'docker-selinux', 'docker-engine-selinux', 'docker-engine']
+    state: absent
+
+- name: install required packages for docker-ce [redhat family]
+  yum:
+    name: ['yum-utils', 'device-mapper-persistent-data', 'lvm2']
+    state: present
+
+- name: add docker stable repository [redhat family]
+  yum_repository:
+    name: docker-ce
+    description: Docker CE official repository
+    baseurl: "https://download.docker.com/linux/{{ ansible_distribution|lower }}/$releasever/$basearch/stable"
+    gpgcheck: no
+
+- name: disable all not stable docker-ce repositories [redhat family]
+  command: "{{ item }}"
+  with_items:
+    - "yum-config-manager --disable docker-ce-nightly"
+    - "yum-config-manager --disable docker-ce-edge"
+    - "yum-config-manager --disable docker-ce-test"
+
+# - name: make cache [redhat family]
+#   command: "yum makecache fast"
+#   when: ansible_os_family == "RedHat"

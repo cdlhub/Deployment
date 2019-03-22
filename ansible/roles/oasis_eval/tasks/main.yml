@@ -1,0 +1,77 @@
+- name: install git
+  package:
+    name: git
+    state: present
+
+- name: install oasis repos
+  git:
+    repo: "git://github.com/{{ item.user }}/{{ item.repo }}.git"
+    version: "{{ item.version }}"
+    depth: 1
+    dest: "/home/{{ admin_user }}/{{ item.repo }}"
+    force: yes
+  with_items:
+    - { user: "{{ git_user_api }}", repo: "{{ git_repo_api }}", version: "{{ git_version_api }}" }
+    - { user: "{{ git_user_ui }}", repo: "{{ git_repo_ui }}", version: "{{ git_version_ui }}" }
+    - { user: "{{ git_user_piwind }}", repo: "{{ git_repo_piwind }}", version: "{{ git_version_piwind }}" }
+
+- name: pull oasis api docker images
+  docker_image:
+    name: "{{ item.user }}{{ item.image }}{{ item.tag }}"
+  with_items: 
+    - { user: "{{ docker_usr_api_server }}/", image: "{{ docker_img_api_server }}", tag: ":{{ docker_tag_api_server }}" }
+    - { user: "{{ docker_usr_model_worker }}/", image: "{{ docker_img_model_worker }}", tag: ":{{ docker_tag_model_worker }}" }
+    - { user: "", image: "mysql", tag: "" }
+    - { user: "", image: "rabbitmq", tag: ":3-management" }
+    - { user: "iserko/", image: "docker-celery-flower", tag: "" }
+
+- name: update image versions in api docker-compose.yml
+  lineinfile:
+    path: "/home/{{ admin_user }}/{{ git_repo_ui }}/docker-compose.yml"
+    regexp: '^(.*)coreoasis/{{ item.image }}:latest'
+    line: '\1{{ item.user }}{{ item.image }}{{ item.tag }}'
+    backrefs: yes
+  with_items:
+    - { user: "{{ docker_usr_api_server }}/", image: "{{ docker_img_api_server }}", tag: ":{{ docker_tag_api_server }}" }
+    - { user: "{{ docker_usr_model_worker }}/", image: "{{ docker_img_model_worker }}", tag: ":{{ docker_tag_model_worker }}" }
+  
+- name: run oasis api container
+  docker_service:
+    project_src: "/home/{{ admin_user }}/{{ git_repo_api }}"
+  environment:
+    OASIS_MODEL_DATA_DIR: "/home/{{ admin_user }}/{{ git_repo_piwind }}"
+  register: oasis_api_output
+
+# - name: docker-compose debug - oasis api
+#   debug:
+#     var: oasis_api_output
+
+- name: create docker network shiny-net
+  docker_network:
+    name: "{{ docker_network }}"
+
+- name: pull oasis ui docker images
+  docker_image:
+    name: "{{item.user }}{{ item.image }}{{ item.tag }}"
+  with_items: 
+    - { user: "{{ docker_usr_oasisui_app }}/", image: "{{ docker_img_oasisui_app }}", tag: ":{{ docker_tag_oasisui_app }}" }
+    - { user: "{{ docker_usr_oasisui_proxy }}/", image: "{{ docker_img_oasisui_proxy }}", tag: ":{{ docker_tag_oasisui_proxy }}" }
+
+- name: update image versions in ui docker-compose.yml
+  lineinfile:
+    path: "/home/{{ admin_user }}/{{ git_repo_ui }}/docker-compose.yml"
+    regexp: '^(.*)coreoasis/{{ item.image }}:latest'
+    line: '\1{{ item.user }}{{ item.image }}{{ item.tag }}'
+    backrefs: yes
+  with_items:
+    - { user: "{{ docker_usr_oasisui_app }}/", image: "{{ docker_img_oasisui_app }}", tag: ":{{ docker_tag_oasisui_app }}" }
+    - { user: "{{ docker_usr_oasisui_proxy }}/", image: "{{ docker_img_oasisui_proxy }}", tag: ":{{ docker_tag_oasisui_proxy }}" }
+
+- name: run oasis ui container
+  docker_service:
+    project_src: "/home/{{ admin_user }}/{{ git_repo_ui }}"
+  register: oasis_ui_output
+
+# - name: docker-compose debug - oasis ui
+#   debug:
+#     var: oasis_ui_output

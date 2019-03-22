@@ -1,0 +1,30 @@
+# Depends on pip: see: pip role
+
+- name: install aptitude [debian family]
+  apt:
+    name: aptitude
+    state: present
+  when: ansible_facts['os_family']|lower == 'debian'
+
+- name: update package cache
+  package: 
+    update_cache: yes
+
+# Install Docker CE
+# See:
+#  * https://github.com/dwdraju/ansible-install-docker
+#  * https://docs.docker.com/install/
+
+- name: prepare docker-ce install [redhat family]
+  import_tasks: redhat.yml
+  when: ansible_facts['os_family']|lower == 'redhat'
+
+- name: prepare docker-ce install [debian family]
+  import_tasks: debian.yml
+  when: ansible_facts['os_family']|lower == 'debian'
+
+- name: install docker-ce
+  import_tasks: docker_ce.yml
+
+# - name: install docker-compose
+#   import_tasks: docker_compose.yml
