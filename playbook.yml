@@ -302,6 +302,8 @@
 
     - name: create sql database
       command: "/home/{{ admin_user }}/OasisUI/SQLFiles/create_db.py -s {{ sql_server_ip }} -p {{ sql_sa_pass }} -n {{ sql_db_env_name }} -l {{ sql_db_env_pass }} -f {{ flamingo_share_loc }} -F {{ shiny_files_loc }} -v {{ oasis_release_tag }}"
+      args:
+        chdir: "/home/{{ admin_user }}"
 
     - name: copy generic yml files
       copy:
