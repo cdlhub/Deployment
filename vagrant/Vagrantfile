@@ -12,15 +12,15 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
   config.ssh.forward_agent = true  
 
   # debian VM for Ansible uneder Windows
-  config.vm.define "ansible-sys", autostart: false do |ansible|
-    ansible.vm.box = "geerlingguy/centos7"
-    ansible.vm.network "private_network", ip: "192.168.2.10"
-    ansible.vm.network "forwarded_port", guest: 22, host: 2210, id:"ssh", protocol: "tcp"
-    ansible.vm.hostname = "ansible-sys"
-    ansible.vm.provider "virtualbox" do |vb|
-        vb.name = "ANSIBLE_SYS"
+  config.vm.define "deploy-sys", autostart: false do |deploy|
+    deploy.vm.box = "geerlingguy/centos7"
+    deploy.vm.network "private_network", ip: "192.168.2.10"
+    deploy.vm.network "forwarded_port", guest: 22, host: 2210, id:"ssh", protocol: "tcp"
+    deploy.vm.hostname = "deploy-sys"
+    deploy.vm.provider "virtualbox" do |vb|
+        vb.name = "DEPLOY_SYS"
     end
-    ansible.vm.provision "shell", path: "provision.sh"
+    deploy.vm.provision "shell", path: "provision-deploy-sys.sh"
   end
 
   config.vm.define "oasis-centos", autostart: false do |centos|
