@@ -1,5 +1,5 @@
 provider "aws" {
-  profile = "cdl_tftuto"
+  profile = "${var.profile}"
   region = "${var.region}"
 
   provisioner "local-exec" {
@@ -8,6 +8,6 @@ provider "aws" {
 }
 
 resource "aws_instance" "oasis_aws" {
-  ami           = "ami-01b60a3259250381b"
-  instance_type = "t2.micro"
+  ami           = "${var.ami}"
+  instance_type = "${var.instance_type}"
 }
