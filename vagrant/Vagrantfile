@@ -20,7 +20,7 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
     ansible.vm.provider "virtualbox" do |vb|
         vb.name = "ANSIBLE_SYS"
     end
-    ansible.vm.provision "shell", inline: "sudo yum update -y && sudo yum install ansible -y"
+    ansible.vm.provision "shell", path: "provision.sh"
   end
 
   config.vm.define "oasis-centos", autostart: false do |centos|
