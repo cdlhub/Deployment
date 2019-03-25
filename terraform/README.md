@@ -19,5 +19,6 @@ aws_secret_access_key = <secret+id+2>
 ```sh
 terraform init
 terraform apply
+terraform apply -var 'region=us-east-1' -var 'profile=<your-aws-profile>'
 terraform show
 ```
